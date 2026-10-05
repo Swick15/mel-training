@@ -1,0 +1,16 @@
+{
+  "name": "Mel's Training",
+  "short_name": "Mel's Training",
+  "description": "Mel's 2-week gym block with guided workout timers and a score tracker.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#151C26",
+  "theme_color": "#151C26",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
