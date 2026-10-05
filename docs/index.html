@@ -168,6 +168,29 @@ td.val{font-variant-numeric:tabular-nums;font-weight:600;min-width:6.5rem}
 .t-btn{min-height:56px;border-radius:14px;border:1.5px solid var(--tline);background:transparent;color:var(--tfg);font-weight:700;font-size:1.05rem}
 .t-btn.go{background:var(--tfg);color:var(--tbg);border-color:var(--tfg);min-height:76px;font-size:1.35rem;font-family:var(--display);text-transform:uppercase;letter-spacing:.03em}
 .t-confirm{display:grid;gap:10px;background:color-mix(in srgb,var(--tfg) 10%,transparent);border-radius:14px;padding:14px}
+.t-tog{display:flex;gap:6px;flex:none}
+.t-big:empty{display:none}
+#timer[data-mode="setup"] .t-move{font-size:clamp(2.3rem,11vw,3.6rem)}
+#timer[data-mode="setup"] .t-x{font-size:1.2rem;line-height:1.4;color:var(--tfg);max-width:28rem}
+#timer[data-mode="steps"] .t-big{font-size:clamp(5rem,26vw,9rem)}
+.t-extra{width:100%;max-width:26rem}
+.t-extra:empty{display:none}
+
+/* weights & settings */
+.grow{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.gline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.glabel{font-weight:700}
+.gnote{font-weight:500;color:var(--muted);font-size:.85rem}
+.stepper{display:inline-flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:transparent;font-size:1.35rem;font-weight:700;line-height:1;padding:0}
+.stepper input{width:4.4rem;min-height:44px;text-align:center;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:700 1.1rem var(--body);font-variant-numeric:tabular-nums}
+.kg{font-size:.85rem;color:var(--muted);font-weight:600}
+.gset{width:100%;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;font:500 .95rem var(--body)}
+.t-gear{text-align:left}
+.t-gear .grow{border-color:var(--tline)}
+.t-gear .stepper button{border-color:var(--tline);color:var(--tfg)}
+.t-gear .stepper input,.t-gear .gset{background:transparent;color:var(--tfg);border-color:var(--tline)}
+.t-gear .gnote,.t-gear .kg{color:var(--tmuted)}
 @media (prefers-reduced-motion: reduce){#timer{transition:none}}
 </style>
 
@@ -179,27 +202,62 @@ td.val{font-variant-numeric:tabular-nums;font-weight:600;min-width:6.5rem}
 const BUYIN=['1 km row','2 km bike','10 min incline walk/jog'];
 const BUYOUT=['1 km row','2 km bike'];
 const WARMUP={t:'warmup',title:'Warm-up',secs:300,text:'5 minutes easy on the rower, bike or elliptical.'};
+const PHONE={t:'Prop your phone up',d:'Somewhere you can see it from every station, with the volume up. It will guide you from here.'};
 const SESS=[
- {id:'upper',name:'Upper',day:'Tue',dur:'~38 min',blocks:[
+ {id:'upper',name:'Upper',day:'Tue',dur:'~38 min',
+  arrive:[
+   {t:'Find your corner',d:'Look for a spot where the rower, lat pulldown and a bench are close together. The EMOM moves between all of them every minute.'},
+   {t:'Rower',d:'Set the monitor to show calories. Do your warm-up on it too.'},
+   {t:'Lat pulldown',d:'Thigh pad: {pulldown_s}. Weight: {pulldown}.',g:['pulldown']},
+   {t:'Bench',d:'Pull a bench close for push-ups. Hands on it if you need to.'},
+   {t:'Dumbbells',d:'Grab 2 × {db} for shoulder press and leave them by the bench.',g:['db']},
+   {t:'Burpee space',d:'Clear a bit of floor next to the bench.'},
+   {t:'Later: cables',d:'Note where the cable machine is. The finisher uses it for rows and pushdowns.'},
+   PHONE],
+  blocks:[
   WARMUP,
   {t:'emom',title:'EMOM 25',text:'5 rounds of a 5-minute cycle. Start each move on the minute and rest for whatever is left.',rounds:5,moves:[
    {r:'12',n:'Cal row'},{r:'12',n:'Lat pulldowns'},{r:'10',n:'Push-ups',x:'Hands on a bench if needed'},{r:'12',n:'DB shoulder press'},{r:'8',n:'Step-back burpees'}]},
-  {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable rows'},{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'30s',n:'Plank',secs:30}]}],
+  {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable rows'},{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'30s',n:'Plank',secs:30}],
+   setup:[
+    {t:'Cable row',d:'Attach the row handle. Seat: {cablerow_s}. Weight: {cablerow}.',g:['cablerow']},
+    {t:'Tricep pushdown',d:'Attachment: {pushdown_s}, on the high pulley. Weight: {pushdown}.',g:['pushdown']},
+    {t:'Curls and plank',d:'Bring your 2 × {db} dumbbells for curls, and grab a mat for the plank.',g:['db']}]}],
   log:[{id:'emom',label:'Finished each EMOM minute with time spare?',type:'choice',opts:['Every minute','Most minutes','Not yet']},
        {id:'db',label:'Dumbbell weight',type:'text',ph:'e.g. 6 kg'}]},
- {id:'lower',name:'Lower',day:'Thu',dur:'~40 min',blocks:[
+ {id:'lower',name:'Lower',day:'Thu',dur:'~40 min',
+  arrive:[
+   {t:'Find your spot',d:'A bench with clear floor around it for lunges, swings and burpees. Leave room to swing a kettlebell safely.'},
+   {t:'Kettlebell',d:'Grab the {kb} kettlebell. Move up to 12 kg once your form and pace hold steady.',g:['kb']},
+   {t:'Bench',d:'A flat, stable bench for step-ups.'},
+   {t:'Warm-up',d:'Warm up on the elliptical if it’s free. You’ll finish on it later.'},
+   {t:'Later: leg press, elliptical, mat',d:'Note where they are. You’ll use them after the AMRAP.'},
+   PHONE],
+  blocks:[
   WARMUP,
   {t:'amrap',title:'AMRAP 20',text:'As many rounds as you can in 20 minutes. Tap +1 each time you finish a round.',secs:1200,moves:[
    {r:'10',n:'Goblet squats',x:'Kettlebell'},{r:'12',n:'Reverse lunges',x:'6 per leg'},{r:'12',n:'Bench step-ups',x:'6 per leg'},{r:'10',n:'Kettlebell swings'},{r:'8',n:'Step-back burpees'}]},
-  {t:'circuit',title:'Finisher 1',unit:'Set',rounds:2,moves:[{r:'20',n:'Seated leg press',x:'Light'}]},
-  {t:'intervals',title:'Finisher 2 · Cardio',text:'Elliptical: 1 minute hard, 1 minute easy, 5 rounds. Check the distance when you finish.',rounds:5,work:60,rest:60},
-  {t:'circuit',title:'Abs',rounds:2,moves:[{r:'30s',n:'Plank',secs:30},{r:'12',n:'Dead bugs',x:'6 per side'},{r:'15',n:'Bicycle crunches',x:'Total'},{r:'12',n:'Russian twists',x:'Total, bodyweight or light plate'}]}],
+  {t:'circuit',title:'Finisher 1',unit:'Set',rounds:2,moves:[{r:'20',n:'Seated leg press',x:'Light'}],
+   setup:[{t:'Seated leg press',d:'Seat: {legpress_s}. Weight: {legpress}. Keep it light for 20 smooth reps.',g:['legpress']}]},
+  {t:'intervals',title:'Finisher 2 · Cardio',text:'Elliptical: 1 minute hard, 1 minute easy, 5 rounds. Check the distance when you finish.',rounds:5,work:60,rest:60,
+   setup:[{t:'Elliptical',d:'Reset the display, or note the distance, so you can check it at the end. 1 minute hard, 1 minute easy, 5 times.'}]},
+  {t:'circuit',title:'Abs',rounds:2,moves:[{r:'30s',n:'Plank',secs:30},{r:'12',n:'Dead bugs',x:'6 per side'},{r:'15',n:'Bicycle crunches',x:'Total'},{r:'12',n:'Russian twists',x:'Total, bodyweight or light plate'}],
+   setup:[{t:'Mat',d:'Grab a mat, and a light plate for Russian twists if you want one.'}]}],
   log:[{id:'rounds',label:'AMRAP rounds completed',type:'num'},{id:'reps',label:'Extra reps into the next round',type:'num'},
        {id:'dist',label:'Elliptical finisher distance',type:'text',ph:'e.g. 1.6 km'},{id:'kb',label:'Kettlebell used',type:'choice',opts:['8 kg','12 kg']}]},
  {id:'pilates',name:'Pilates',day:'Fri',dur:'30–40 min',blocks:[
   {t:'free',title:'Reformer Pilates',text:'Core, glutes and mobility. A class you like or a self-led flow.'}],
   log:[{id:'what',label:'Class or flow',type:'text',ph:'e.g. Friday reformer class'}]},
- {id:'full',name:'Full body',day:'Sat',dur:'~38–42 min',blocks:[
+ {id:'full',name:'Full body',day:'Sat',dur:'~38–42 min',
+  arrive:[
+   {t:'Buy-in: {buyIn}',d:'Find the machine you’ll start on.'},
+   {t:'Your station',d:'Set up right next to a bike or elliptical. You do 12 cal on it every round.'},
+   {t:'Dumbbells',d:'2 × {db} for rows and curls.',g:['db']},
+   {t:'Goblet squats',d:'The {kb} kettlebell.',g:['kb']},
+   {t:'Mat',d:'A mat for burpees and sit-ups.'},
+   {t:'Buy-out: {buyOut}',d:'Note where it is so you can go straight there after round 4.'},
+   PHONE],
+  blocks:[
   {t:'fortime',title:'Round Off',text:'For time. The clock runs from the start of the buy-in to the end of the buy-out.',rounds:4,moves:[
    {r:'8',n:'Burpees'},{r:'10',n:'DB rows'},{r:'12',n:'Goblet squats'},{r:'14',n:'Alt curls'},{r:'16',n:'Sit-ups'},{r:'12',n:'Cal bike or elliptical'}]}],
   log:[{id:'time',label:'Total time',type:'text',ph:'mm:ss'},{id:'buyIn',label:'Buy-in',type:'choice',opts:BUYIN},{id:'buyOut',label:'Buy-out',type:'choice',opts:BUYOUT},
@@ -211,10 +269,46 @@ const byId=id=>SESS.find(s=>s.id===id);
 const key=(w,id)=>'w'+w+'-'+id;
 
 /* ---------- storage ---------- */
-const LS='melBlock.v1',LSD='melBlock.drafts',LST='melBlock.timer',LSU='melBlock.ui',LSS='melBlock.sound';
+const LS='melBlock.v1',LSD='melBlock.drafts',LST='melBlock.timer',LSU='melBlock.ui',LSS='melBlock.sound',LSG='melBlock.gear',LSV='melBlock.voice';
 const rd=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const wr=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let entries=rd(LS,{}),drafts=rd(LSD,{}),ui=rd(LSU,{view:'home'}),sound=rd(LSS,true);
+let entries=rd(LS,{}),drafts=rd(LSD,{}),ui=rd(LSU,{view:'home'}),sound=rd(LSS,true),gear=rd(LSG,{}),voice=rd(LSV,false);
+
+/* ---------- weights & machine settings ---------- */
+const GEAR={
+  db:{label:'Dumbbells',note:'each',step:1},
+  kb:{label:'Kettlebell',step:4,def:8},
+  pulldown:{label:'Lat pulldown',step:2.5,set:'Thigh pad setting'},
+  cablerow:{label:'Cable row',step:2.5,set:'Seat setting'},
+  pushdown:{label:'Tricep pushdown',step:2.5,set:'Rope or bar'},
+  legpress:{label:'Leg press',step:5,set:'Seat setting'}
+};
+const saveGear=()=>wr(LSG,gear);
+const gw=id=>{const g=gear[id];return g&&g.w!=null&&!isNaN(g.w)?g.w:(GEAR[id].def!=null?GEAR[id].def:null)};
+const kgs=n=>(Math.round(n*10)/10)+' kg';
+function fill(text,v){
+  return String(text).replace(/\{(\w+)\}/g,(m,k)=>{
+    if(k==='buyIn'||k==='buyOut')return (v&&v[k])||'your pick';
+    if(/_s$/.test(k)){const g=gear[k.slice(0,-2)];return (g&&g.s)||'your usual setting'}
+    const w=GEAR[k]?gw(k):null;return w!=null?kgs(w):'your usual weight';
+  });
+}
+function gearRow(id,sfx){
+  const G=GEAR[id],w=gw(id),g=gear[id]||{};
+  return '<div class="grow"><div class="gline"><span class="glabel">'+G.label+(G.note?' <span class="gnote">('+G.note+')</span>':'')+'</span>'
+    +'<span class="stepper"><button data-act="g-dn" data-g="'+id+'" aria-label="Lighter '+G.label+'">−</button>'
+    +'<input id="g-'+id+sfx+'" data-g="'+id+'" inputmode="decimal" aria-label="'+G.label+' kg" value="'+(w==null?'':w)+'" placeholder="–"><span class="kg">kg</span>'
+    +'<button data-act="g-up" data-g="'+id+'" aria-label="Heavier '+G.label+'">+</button></span></div>'
+    +(G.set?'<input class="gset" id="gs-'+id+sfx+'" data-gs="'+id+'" aria-label="'+G.set+'" placeholder="'+G.set+'" value="'+esc(g.s||'')+'">':'')+'</div>';
+}
+
+/* ---------- voice cues ---------- */
+const speakable=t=>String(t).replace(/\bDB\b/g,'dumbbell').replace(/\bcal\b/gi,'calorie').replace(/\bAlt\b/g,'alternating')
+  .replace(/×/g,'times').replace(/(\d)\s?kg\b/g,'$1 kilos').replace(/EMOM/g,'E-mom').replace(/AMRAP/g,'am-rap').replace(/[·–]/g,',');
+function say(t){
+  if(!voice||!t||!('speechSynthesis'in window))return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(speakable(t));u.lang='en-AU';u.rate=1.02;speechSynthesis.speak(u)}catch(e){}
+}
 let db=null,sync='local',pendingRender=false,confirmReset=false;
 const saveLocal=()=>wr(LS,entries),saveDrafts=()=>wr(LSD,drafts),saveUi=()=>wr(LSU,ui);
 function draft(k){return drafts[k]||(drafts[k]={done:{},rounds:{},vals:{}})}
@@ -297,6 +391,11 @@ function viewHome(){
     +'<li><b>Kettlebell</b><span>Start at 8 kg for goblets and swings. Move to 12 kg once form and pace hold steady.</span></li>'
     +'<li><b>Dumbbells</b><span>A weight you could do 12–15 reps with, leaving about 3 in reserve.</span></li>'
     +'<li><b>Machines</b><span>Keep machines and cables light and steady.</span></li></ul></section>'
+    +'<section class="panel"><h2>Weights &amp; settings</h2><p class="small muted">Set these once. The setup steps tell you what to grab, and + moves a weight up when it’s time.</p>'
+    +'<div>'+Object.keys(GEAR).map(id=>gearRow(id,'')).join('')+'</div>'
+    +'<div class="grow"><div class="gline"><span class="glabel">Timer sounds</span><span class="chips"><button class="chip'+(sound?' sel':'')+'" data-act="t-sound" aria-pressed="'+sound+'">Beeps '+(sound?'on':'off')+'</button>'
+    +'<button class="chip'+(voice?' sel':'')+'" data-act="t-voice" aria-pressed="'+voice+'">Voice '+(voice?'on':'off')+'</button></span></div>'
+    +'<p class="small muted">Voice reads out each setup step and what’s next, so you don’t have to look at your phone.</p></div></section>'
     +footer();
 }
 function footer(){
@@ -321,7 +420,8 @@ function blockBody(s,b,bi,k){
       const got=d.rounds[bi]||0,u=b.unit||'Round';
       h+='<div class="chips">'+Array.from({length:b.rounds},(_,i)=>'<button class="chip'+(i<got?' on':'')+'" data-act="round" data-bi="'+bi+'" data-r="'+(i+1)+'">'+u+' '+(i+1)+(i<got?' ✓':'')+'</button>').join('')+'</div>';
     }
-    const lbl={warmup:'Start 5:00 warm-up',emom:'Start EMOM timer',amrap:'Start 20:00 AMRAP',intervals:'Start interval timer'}[b.t];
+    const lbl={warmup:'Start 5:00 warm-up',emom:'Start EMOM timer',amrap:'Start 20:00 AMRAP',intervals:'Start interval timer',
+      circuit:'Start guided '+(b.unit==='Set'?'sets':'rounds')}[b.t];
     if(lbl)h+='<button class="btn full" data-act="start" data-bi="'+bi+'">'+lbl+'</button>';
   }
   return h;
@@ -336,12 +436,20 @@ function viewSession(){
   if(!d.init){d.init=1;
     if(e&&e.vals)d.vals={...e.vals};
     if(prev&&prev.vals&&s.id==='full'){if(!d.vals.buyIn)d.vals.buyIn=prev.vals.buyIn;if(!d.vals.buyOut)d.vals.buyOut=prev.vals.buyOut}
+    if(!d.vals.db&&gw('db')!=null&&s.log.some(f=>f.id==='db'))d.vals.db=kgs(gw('db'));
+    if(!d.vals.kb&&s.log.some(f=>f.id==='kb')&&['8 kg','12 kg'].includes(kgs(gw('kb'))))d.vals.kb=kgs(gw('kb'));
     saveDrafts();
   }
   const ps=prev&&summary(s.id,prev.vals);
   let h='<button class="back" data-act="home">‹ All sessions</button>'
    +'<header class="shead"><div class="eyebrow">Week '+w+' · '+s.day+' · '+s.dur+'</div><h1>'+esc(s.name)+'</h1></header>';
   if(ps)h+='<div class="beat"><span class="eyebrow">Week 1 score</span><b>'+esc(ps)+'</b><span class="small">Same loads. Go for better.</span></div>';
+  if(s.arrive){
+    const needPick=s.id==='full'&&!(d.vals.buyIn&&d.vals.buyOut);
+    h+='<section class="hero"><div class="eyebrow">Guided session</div>'
+      +'<p class="meta">'+s.arrive.length+' quick setup steps when you arrive, then every part runs in order. Each part tells you what to set up during the rest before it.</p>'
+      +'<button class="btn full" data-act="session-start"'+(needPick?' disabled':'')+'>'+(needPick?'Choose a buy-in and buy-out below':'Start session')+'</button></section>';
+  }
   h+=s.blocks.map((b,bi)=>{const dn=!!d.done[bi];
     return '<section class="block'+(dn?' done':'')+'" id="part-'+bi+'"><div class="bhead"><div><div class="eyebrow">Part '+(bi+1)+' of '+s.blocks.length+'</div><h3>'+esc(b.title)+'</h3></div>'
       +'<button class="tick'+(dn?' on':'')+'" data-act="done" data-bi="'+bi+'" aria-pressed="'+dn+'" aria-label="Mark '+esc(b.title)+' done">'+CHECK+'</button></div>'
@@ -404,11 +512,41 @@ const saveT=()=>wr(LST,T);
 function startTimer(cfg){
   unlockAudio();
   const lead=cfg.lead==null?5:cfg.lead;
-  T=Object.assign({pausedAt:null,pausedMs:0,count:0,idx:0,fin:null,confirm:false},cfg,{startedAt:Date.now()+lead*1000});
-  saveT();openTimer();wake();
+  T=Object.assign({pausedAt:null,pausedMs:0,count:0,idx:0,stepAt:null,fin:null,confirm:false},cfg,{startedAt:Date.now()+lead*1000});
+  saveT();openTimer();wake();say(introText());
 }
-function blockTimer(bi){
-  const s=byId(ui.sid),b=s.blocks[bi],ref={k:key(ui.w,s.id),bi},title=s.name+' · '+b.title;
+const stepSpeech=st=>st.secs?st.text+', '+st.secs+' seconds':st.reps+' '+st.text;
+const setupVals=()=>T&&T.after?draft(key(T.after.w,T.after.sid)).vals:{};
+function setupSpeech(){const st=T.steps[T.idx],v=setupVals();return fill(st.t,v)+'. '+fill(st.d,v)}
+function introText(){
+  if(T.type==='setup')return setupSpeech();
+  if(T.type==='emom'||T.type==='amrap')return T.label+'. First: '+T.moves[0].r+' '+T.moves[0].n;
+  if(T.type==='intervals')return 'Intervals. Hard first.';
+  if(T.type==='fortime')return T.label+'. Buy-in: '+T.steps[0].text;
+  if(T.type==='steps')return T.label+'. '+stepSpeech(T.steps[0]);
+  return T.move;
+}
+function canRun(sid,w,bi){
+  const b=byId(sid).blocks[bi];if(!b||b.t==='free')return false;
+  if(b.t==='fortime'){const v=draft(key(w,sid)).vals;return !!(v.buyIn&&v.buyOut)}
+  return true;
+}
+function startPart(sid,w,bi,skipSetup){
+  const b=byId(sid).blocks[bi];
+  if(!skipSetup&&b.setup&&b.setup.length)return startTimer({type:'setup',steps:b.setup,label:'Set up · '+b.title,after:{sid,w,bi},lead:0});
+  blockTimer(sid,w,bi);
+}
+function startSession(sid,w){
+  const s=byId(sid);
+  startTimer({type:'setup',steps:s.arrive,label:'Set up · '+s.name,after:{sid,w,bi:0,arrive:true},lead:0});
+}
+function afterSetup(){
+  const a=T.after;closeTimer();
+  ui={view:'session',w:a.w,sid:a.sid};saveUi();render();
+  if(canRun(a.sid,a.w,a.bi))startPart(a.sid,a.w,a.bi,!a.arrive);
+}
+function blockTimer(sid,w,bi){
+  const s=byId(sid),b=s.blocks[bi],ref={k:key(w,sid),bi},title=s.name+' · '+b.title;
   if(b.t==='warmup')return startTimer({type:'countdown',secs:b.secs,label:'Warm-up',move:'Warm-up',x:b.text,ref,title});
   if(b.t==='emom')return startTimer({type:'emom',rounds:b.rounds,moves:b.moves,label:b.title,ref,title});
   if(b.t==='amrap')return startTimer({type:'amrap',secs:b.secs,moves:b.moves,label:b.title,ref,title});
@@ -419,17 +557,23 @@ function blockTimer(bi){
     steps.push({label:'Buy-out',text:v.buyOut});
     return startTimer({type:'fortime',steps,label:b.title,ref,title,lead:3});
   }
+  if(b.t==='circuit'){
+    const u=b.unit||'Round',L=b.moves.length,steps=[];
+    for(let r=1;r<=b.rounds;r++)b.moves.forEach((m,i)=>steps.push({label:u+' '+r+' of '+b.rounds+(L>1?' · '+(i+1)+' of '+L:''),reps:m.r,text:m.n,x:m.x||'',secs:m.secs||0}));
+    return startTimer({type:'steps',steps,label:b.title,ref,title,lead:0});
+  }
 }
 function openTimer(){
   let o=document.getElementById('timer');
   if(!o){o=document.createElement('div');o.id='timer';o.setAttribute('role','dialog');o.setAttribute('aria-label','Workout timer');document.body.appendChild(o)}
-  o.innerHTML='<div class="t-top"><div><div class="t-label" id="tLabel"></div><div class="t-sub" id="tSub"></div></div><button class="t-icon" data-act="t-sound" id="tSound"></button></div>'
+  o.dataset.mode=T.type;
+  o.innerHTML='<div class="t-top"><div><div class="t-label" id="tLabel"></div><div class="t-sub" id="tSub"></div></div>'
+    +'<div class="t-tog"><button class="t-icon" data-act="t-sound" id="tSound"></button><button class="t-icon" data-act="t-voice" id="tVoice"></button></div></div>'
     +'<div class="t-bar"><i id="tBar"></i></div>'
-    +'<div class="t-main" aria-live="polite"><div class="t-big" id="tBig">0:00</div><div class="t-move" id="tMove"></div><div class="t-x" id="tX"></div><div class="t-next" id="tNext"></div>'
-    +(T.type==='amrap'?'<ul class="t-list">'+T.moves.map(m=>'<li><b>'+esc(m.r)+'</b>'+esc(m.n)+'</li>').join('')+'</ul>':'')+'</div>'
+    +'<div class="t-main" aria-live="polite"><div class="t-big" id="tBig"></div><div class="t-move" id="tMove"></div><div class="t-x" id="tX"></div><div class="t-next" id="tNext"></div><div id="tExtra" class="t-extra"></div></div>'
     +'<div id="tCtrl"></div>';
   document.documentElement.style.overflow='hidden';
-  lastS=null;renderCtrl();tick();
+  lastS=null;renderCtrl();renderExtra();tick();
   clearInterval(tickH);tickH=setInterval(tick,200);
 }
 function closeTimer(){
@@ -438,9 +582,21 @@ function closeTimer(){
   document.documentElement.style.overflow='';
   try{wl&&wl.release()}catch(e){}wl=null;
 }
+function renderExtra(){
+  const x=document.getElementById('tExtra');if(!x||!T)return;
+  if(T.type==='amrap'&&!T.fin)x.innerHTML='<ul class="t-list">'+T.moves.map(m=>'<li><b>'+esc(m.r)+'</b>'+esc(m.n)+'</li>').join('')+'</ul>';
+  else if(T.type==='setup'){const g=T.steps[T.idx].g;x.innerHTML=g?'<div class="t-gear">'+g.map(id=>gearRow(id,'-t')).join('')+'</div>':''}
+  else x.innerHTML='';
+}
 function renderCtrl(){
   const c=document.getElementById('tCtrl');if(!c||!T)return;
-  document.getElementById('tSound').textContent=sound?'Sound on':'Sound off';
+  setT('tSound',sound?'Beeps on':'Beeps off');setT('tVoice',voice?'Voice on':'Voice off');
+  if(T.type==='setup'){
+    const last=T.idx>=T.steps.length-1,nb=byId(T.after.sid).blocks[T.after.bi];
+    c.innerHTML='<div class="t-ctrl"><button class="t-btn go wide" data-act="t-next">'+(last?'Ready · start '+esc(nb.title):'Got it · next')+'</button>'
+      +(T.idx>0?'<button class="t-btn" data-act="t-back">Back</button>':'<button class="t-btn" data-act="t-close">Close</button>')
+      +'<button class="t-btn" data-act="t-skip">Skip setup</button></div>';return;
+  }
   if(T.fin){
     const np=nextPart();
     c.innerHTML='<div class="t-ctrl">'+(!T.ref?'<button class="t-btn go wide" data-act="t-close">Done</button>'
@@ -453,7 +609,10 @@ function renderCtrl(){
   let main='';
   if(T.type==='amrap')main='<button class="t-btn go wide" data-act="t-plus">+1 round</button>';
   if(T.type==='fortime')main='<button class="t-btn go wide" data-act="t-next">Done · next</button>';
-  const extra=T.type==='amrap'?'<button class="t-btn" data-act="t-minus">−1 round</button>':T.type==='fortime'?'<button class="t-btn" data-act="t-back">Back a step</button>':'';
+  if(T.type==='steps'){const st=T.steps[T.idx];
+    main=st.secs&&T.stepAt==null?'<button class="t-btn go wide" data-act="t-stepgo">Start '+st.secs+'s</button>'
+      :'<button class="t-btn go wide" data-act="t-next">'+(st.secs?'Skip · next':'Done · next')+'</button>'}
+  const extra=T.type==='amrap'?'<button class="t-btn" data-act="t-minus">−1 round</button>':(T.type==='fortime'||T.type==='steps')?'<button class="t-btn" data-act="t-back">Back a step</button>':'';
   c.innerHTML='<div class="t-ctrl">'+main+'<button class="t-btn" data-act="t-pause">'+(T.pausedAt?'Resume':'Pause')+'</button>'+(extra||'')+'<button class="t-btn'+(extra?' wide':'')+'" data-act="t-stop">Stop</button></div>';
 }
 function nextPart(){
@@ -465,13 +624,23 @@ function saveTimerResult(){
   const r=T.ref,d=draft(r.k);d.done[r.bi]=true;
   if(T.type==='amrap')d.vals.rounds=String(T.count);
   if(T.type==='fortime'&&T.idx>=T.steps.length)d.vals.time=fmt(T.fin.e);
+  if(T.type==='steps'&&T.idx>=T.steps.length)d.rounds[r.bi]=byId(r.k.split('-')[1]).blocks[r.bi].rounds;
   saveDrafts();
 }
 function setT(id,v){const n=document.getElementById(id);if(n&&n.textContent!==v)n.textContent=v}
 function finish(){
   if(!T||T.fin)return;
   T.fin={e:Math.max(0,elapsed())};T.confirm=false;if(!T.pausedAt)T.pausedAt=Date.now();
-  saveT();long();setTimeout(long,600);renderCtrl();tick();
+  saveT();long();setTimeout(long,600);renderCtrl();renderExtra();tick();
+  const np=nextPart();
+  say(!T.ref?'Done.':(T.type==='amrap'?T.count+' rounds. ':'')+(T.type==='intervals'?'Done. Check your distance.':'Done.')
+    +(np?' Next up: '+np.b.title+'.':' Session complete. Log your scores.'));
+}
+function advance(){
+  T.idx++;T.stepAt=null;T._lr=null;
+  if(T.idx>=T.steps.length){T.idx=T.steps.length;saveT();return finish()}
+  saveT();short();renderCtrl();
+  const st=T.steps[T.idx];say(T.type==='steps'?stepSpeech(st):st.text);tick();
 }
 function tick(){
   if(!T)return;
@@ -479,16 +648,21 @@ function tick(){
   const e=elapsed(),s=Math.floor(e),crossed=s!==lastS&&!T.pausedAt;lastS=s;
   setT('tLabel',T.label);
   let big='',move='',x='',next='',sub='',bar=0,phase='';
-  if(T.fin){
-    phase='';bar=1;
+  if(T.type==='setup'){
+    const st=T.steps[T.idx],nx=T.steps[T.idx+1],v=setupVals();
+    move=fill(st.t,v);x=fill(st.d,v);sub='Step '+(T.idx+1)+' of '+T.steps.length;
+    next=nx?'Next: '+fill(nx.t,v):'';bar=(T.idx+1)/T.steps.length;
+  }else if(T.fin){
+    bar=1;
     if(T.type==='amrap'){big=String(T.count);move=T.count===1?'round':'rounds';x='Add any extra reps when you log the session.'}
     else if(T.type==='fortime'){big=fmt(T.fin.e);move=T.idx>=T.steps.length?'Finished':'Stopped';x=T.idx>=T.steps.length?'Total time':'Stopped at step '+(T.idx+1)+' of '+T.steps.length}
     else if(T.type==='intervals'){big=fmt(T.fin.e);move='Intervals done';x='Check the distance on the elliptical.'}
+    else if(T.type==='steps'){big=fmt(T.fin.e);move=T.label+' done'}
     else{big=fmt(T.fin.e);move=T.type==='emom'?'EMOM done':'Done'}
     sub=T.title||'';
   }else if(e<0){
     big=String(Math.ceil(-e));move='Get ready';
-    const f=T.type==='emom'?T.moves[0].r+' '+T.moves[0].n:T.type==='fortime'?T.steps[0].text:T.type==='intervals'?'Hard first':T.type==='amrap'?T.moves[0].r+' '+T.moves[0].n:'';
+    const f=T.type==='emom'||T.type==='amrap'?T.moves[0].r+' '+T.moves[0].n:T.type==='fortime'?T.steps[0].text:T.type==='intervals'?'Hard first':'';
     next=f?'First: '+f:'';
     if(crossed&&s>=-3)short();
   }else if(T.type==='emom'){
@@ -498,11 +672,11 @@ function tick(){
     big=fmt(Math.ceil(60-(e-m*60)));move=mv.r+' '+mv.n;x=mv.x||'';
     next=m+1<T.rounds*L?'Next: '+nm.r+' '+nm.n:'Last minute';
     sub='Minute '+(m+1)+' of '+(T.rounds*L)+' · Round '+(Math.floor(m/L)+1)+' of '+T.rounds;bar=e/total;
-    if(crossed){const r=s%60;if(r===0)long();else if(r>=57)short()}
+    if(crossed){const r=s%60;if(r===0)long();else if(r>=57)short();if(r===50&&m+1<T.rounds*L)say('Next: '+nm.r+' '+nm.n)}
   }else if(T.type==='amrap'){
     if(e>=T.secs){finish();return}
     big=fmt(Math.ceil(T.secs-e));move=T.count+(T.count===1?' round':' rounds');sub=fmt(e)+' gone';bar=e/T.secs;
-    if(crossed){const left=T.secs-s;if(s===0)long();else if(left<=3)short();else if(left===T.secs/2){short();setTimeout(short,250)}}
+    if(crossed){const left=T.secs-s;if(s===0)long();else if(left<=3)short();else if(left===T.secs/2){short();setTimeout(short,250);say('Halfway')}else if(left===60)say('One minute left')}
   }else if(T.type==='intervals'){
     const seg=T.work+T.rest,total=T.rounds*seg;
     if(e>=total){finish();return}
@@ -510,16 +684,24 @@ function tick(){
     big=fmt(Math.ceil(rem));move=hard?'Hard':'Easy';phase=hard?'hard':'easy';
     sub='Round '+(r+1)+' of '+T.rounds;bar=e/total;
     next=hard?'Then 1 min easy':(r+1<T.rounds?'Then 1 min hard':'Last one');
-    if(crossed){const ir=s%seg;if(ir===0||ir===T.work)long();else if((ir>=T.work-3&&ir<T.work)||ir>=seg-3)short()}
+    if(crossed){const ir=s%seg;if(ir===0||ir===T.work){long();if(s>0)say(ir===0?'Hard':'Easy')}else if((ir>=T.work-3&&ir<T.work)||ir>=seg-3)short()}
   }else if(T.type==='countdown'){
     if(e>=T.secs){finish();return}
     big=fmt(Math.ceil(T.secs-e));move=T.move;x=T.x||'';bar=e/T.secs;
-    if(crossed){const left=T.secs-s;if(s===0)long();else if(left<=3)short()}
+    if(crossed){const left=T.secs-s;if(s===0)long();else if(left<=3)short();else if(left===60&&T.secs>=120)say('One minute left')}
   }else if(T.type==='fortime'){
     const st=T.steps[T.idx],nx=T.steps[T.idx+1];
     big=fmt(e);move=st.text;sub=st.label;x='Step '+(T.idx+1)+' of '+T.steps.length;
     next=nx?'Next: '+nx.text:'Last one. Finish strong.';bar=T.idx/T.steps.length;
     if(crossed&&s===0)long();
+  }else if(T.type==='steps'){
+    const st=T.steps[T.idx],nx=T.steps[T.idx+1];
+    sub=st.label;move=st.text;x=st.x;bar=T.idx/T.steps.length;
+    next=nx?'Next: '+(nx.secs?nx.text+' · '+nx.secs+'s':nx.reps+' '+nx.text):'Last one';
+    if(!st.secs)big=st.reps;
+    else if(T.stepAt==null)big=fmt(st.secs);
+    else{const rem=st.secs-(e-T.stepAt);if(rem<=0)return advance();
+      const rw=Math.ceil(rem);big=fmt(rw);if(rw!==T._lr){T._lr=rw;if(rw<=3&&!T.pausedAt)short()}}
   }
   if(T.pausedAt&&!T.fin)sub=(sub?sub+' · ':'')+'Paused';
   setT('tBig',big);setT('tMove',move);setT('tX',x);setT('tNext',next);setT('tSub',sub);
@@ -528,6 +710,11 @@ function tick(){
 }
 
 /* ---------- actions ---------- */
+document.addEventListener('input',ev=>{
+  const t=ev.target,d=t.dataset||{};
+  if(d.g){const n=parseFloat(t.value);gear[d.g]={...(gear[d.g]||{}),w:isNaN(n)?null:n};saveGear();tick()}
+  else if(d.gs){gear[d.gs]={...(gear[d.gs]||{}),s:t.value};saveGear();tick()}
+});
 document.addEventListener('click',ev=>{
   const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;
   const a=b.dataset.act,k=ui.sid?key(ui.w,ui.sid):null;
@@ -535,7 +722,8 @@ document.addEventListener('click',ev=>{
     case 'home':return go('home');
     case 'scores':return go('scores');
     case 'open':return go('session',{w:+b.dataset.w,sid:b.dataset.s});
-    case 'start':return blockTimer(+b.dataset.bi);
+    case 'session-start':return startSession(ui.sid,ui.w);
+    case 'start':return startPart(ui.sid,ui.w,+b.dataset.bi);
     case 'mini':return startTimer({type:'countdown',secs:+b.dataset.secs,label:b.dataset.n,move:b.dataset.n,lead:3});
     case 'done':{const d=draft(k),bi=+b.dataset.bi;d.done[bi]=!d.done[bi];saveDrafts();return render()}
     case 'round':{const d=draft(k),bi=+b.dataset.bi,r=+b.dataset.r,blk=byId(ui.sid).blocks[bi];
@@ -556,7 +744,14 @@ document.addEventListener('click',ev=>{
       if(db)ks.forEach(x=>{db.doc('log/'+x).delete().catch(()=>{})});
       toast('New block started');return render();
     }
-    case 't-sound':sound=!sound;wr(LSS,sound);if(sound)unlockAudio();return renderCtrl();
+    case 'g-up':case 'g-dn':{
+      const id=b.dataset.g,G=GEAR[id],cur=gw(id);
+      let n=cur==null?(a==='g-up'?G.step:0):cur+(a==='g-up'?G.step:-G.step);n=Math.max(0,Math.round(n*10)/10);
+      gear[id]={...(gear[id]||{}),w:n};saveGear();
+      document.querySelectorAll('input[data-g="'+id+'"]').forEach(i=>{i.value=n});return tick();
+    }
+    case 't-sound':sound=!sound;wr(LSS,sound);if(sound){unlockAudio();short()}renderCtrl();return render();
+    case 't-voice':voice=!voice;wr(LSV,voice);if(voice)say('Voice cues on');renderCtrl();return render();
     case 't-pause':
       if(T.pausedAt){T.pausedMs+=Date.now()-T.pausedAt;T.pausedAt=null;wake()}else T.pausedAt=Date.now();
       saveT();renderCtrl();return tick();
@@ -565,17 +760,24 @@ document.addEventListener('click',ev=>{
     case 't-end':return finish();
     case 't-plus':T.count++;saveT();short();return tick();
     case 't-minus':T.count=Math.max(0,T.count-1);saveT();return tick();
+    case 't-stepgo':T.stepAt=Math.max(0,elapsed());T._lr=null;saveT();short();return renderCtrl();
     case 't-next':
+      if(T.type==='setup'){
+        T.idx++;if(T.idx>=T.steps.length)return afterSetup();
+        saveT();renderCtrl();renderExtra();say(setupSpeech());return tick();
+      }
       if(elapsed()<0)return;
-      T.idx++;if(T.idx>=T.steps.length){T.idx=T.steps.length;saveT();return finish()}
-      saveT();short();return tick();
-    case 't-back':T.idx=Math.max(0,T.idx-1);saveT();return tick();
+      return advance();
+    case 't-back':
+      T.idx=Math.max(0,T.idx-1);T.stepAt=null;T._lr=null;saveT();renderCtrl();
+      if(T.type==='setup'){renderExtra();say(setupSpeech())}
+      return tick();
+    case 't-skip':T.after.arrive=false;return afterSetup();
     case 't-save':saveTimerResult();closeTimer();toast('Saved to session');return render();
     case 't-nextpart':{
       const np=nextPart();saveTimerResult();closeTimer();
       ui={view:'session',w:np.w,sid:np.s.id};saveUi();render();
-      const b=np.b,v=draft(key(np.w,np.s.id)).vals;
-      if(['warmup','emom','amrap','intervals'].includes(b.t)||(b.t==='fortime'&&v.buyIn&&v.buyOut))return blockTimer(np.bi);
+      if(canRun(np.s.id,np.w,np.bi))return startPart(np.s.id,np.w,np.bi);
       const card=document.getElementById('part-'+np.bi);if(card)card.scrollIntoView({block:'start'});
       return;
     }
