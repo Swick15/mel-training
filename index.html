@@ -264,7 +264,7 @@ const SESS2=[
    {t:'Rower',d:'Set the monitor to show calories. Do your warm-up on it too.'},
    {t:'Dumbbells',d:'Grab 2 × {dbRow} for bent-over rows and 2 × {dbPress} for shoulder press. Leave them by the bench, with the next pair down close by.'+START_LIGHT,g:['dbRow','dbPress']},
    {t:'Bench',d:'Pull a bench close for push-ups. Hands on it if you need to.'},
-   {t:'Later: cables',d:'Note where the cable machine is. The finisher uses it for pushdowns and face pulls.'},
+   {t:'Later: cables',d:'Note where the cable machine is. The finisher uses it for tricep pushdowns.'},
    PHONE],
   blocks:[
   WARMUP,
@@ -273,10 +273,10 @@ const SESS2=[
    {n:'DB bent-over rows',g:'dbRow',reps:[8,10,12,14,16,18,20]},
    {n:'push-ups',x:'Hands on a bench if needed',reps:[8,10,12,14,16,18,20]},
    {n:'DB shoulder press',g:'dbPress',reps:[8,10,12,14,16,18,20]}]},
-  {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'12',n:'Cable face pulls'},{r:'30s',n:'Plank',secs:30}],
+  {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'12',n:'DB incline chest press',x:'Bench on a low incline'},{r:'30s',n:'Plank',secs:30}],
    setup:[
     {t:'Tricep pushdown',d:'Attachment: {pushdown_s}, on the high pulley. Weight: {pushdown}.',g:['pushdown']},
-    {t:'Face pulls',d:'Rope attachment at about head height. Setting: {facepull_s}. Weight: {facepull}.',g:['facepull']},
+    {t:'Incline bench',d:'Set a bench to a low incline, about 30° (usually the first or second notch). Grab 2 × {dbChest} for chest press.',g:['dbChest']},
     {t:'Curls and plank',d:'Bring 2 × {dbCurl} for curls, and grab a mat for the plank.',g:['dbCurl']}]}],
   log:[{id:'level',label:'Highest level fully completed',type:'num'},{id:'drops',label:'Weight dropped during the EMOM',type:'text',ph:'e.g. DB press 5 → 4 kg in round 4'}]},
  {id:'lower',name:'Lower',day:'Thu',dur:'~40 min',ladder:true,
@@ -320,7 +320,7 @@ const BLOCKS={
     ['Same loads','Both weeks use the same weights. The goal each time is to beat last time.'],
     ['Kettlebell','Start at 8 kg for goblets and swings. Move to 12 kg once form and pace hold steady.'],
     ['Dumbbells','A weight you could do 12–15 reps with, leaving about 3 in reserve.']]},
-  2:{name:'Block 2',tag:'Ladder EMOM',sess:SESS2,gear:['dbRow','dbPress','dbCurl','dbThruster','kb','pushdown','facepull','legpress'],rules:[
+  2:{name:'Block 2',tag:'Ladder EMOM',sess:SESS2,gear:['dbRow','dbPress','dbCurl','dbThruster','kb','dbChest','pushdown','legpress'],rules:[
     ['Your level','Upper and Lower: log the highest level you fully clear. In week 2, aim for one more.'],
     ['Level 7','Clear Level 6 in week 1 and week 2 adds a bonus Level 7 round.'],
     ['Saturday','Log your total time and buy-in/buy-out, then compare with your Block 1 Saturdays.'],
@@ -352,7 +352,7 @@ const GEAR={
   dbPress:{label:'DB shoulder press',note:'each',step:1,from:'db'},
   dbCurl:{label:'DB curls',note:'each',step:1,from:'db'},
   dbThruster:{label:'DB thrusters',note:'each, light',step:1},
-  facepull:{label:'Cable face pulls',step:2.5,set:'Pulley height'}
+  dbChest:{label:'DB incline chest press',note:'each',step:1,from:'db'}
 };
 const saveGear=()=>wr(LSG,gear);
 /* A weight not set yet falls back to its Block 1 equivalent (e.g. DB rows start from the old dumbbell weight), then to a default. */
