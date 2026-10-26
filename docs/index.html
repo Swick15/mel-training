@@ -169,6 +169,11 @@ td.val{font-variant-numeric:tabular-nums;font-weight:600;min-width:6.5rem}
 .t-btn.go{background:var(--tfg);color:var(--tbg);border-color:var(--tfg);min-height:76px;font-size:1.35rem;font-family:var(--display);text-transform:uppercase;letter-spacing:.03em}
 .t-confirm{display:grid;gap:10px;background:color-mix(in srgb,var(--tfg) 10%,transparent);border-radius:14px;padding:14px}
 .t-tog{display:flex;gap:6px;flex:none}
+.t-btn.fail{border-color:var(--tfg);min-height:64px;font-size:1.1rem}
+table.ladder th,table.ladder td{text-align:center;padding:8px 6px;font-variant-numeric:tabular-nums}
+table.ladder th:first-child,table.ladder td:first-child{text-align:left}
+table.ladder th{text-transform:none;letter-spacing:.02em;font-size:.75rem}
+table.ladder tr.goal td{background:var(--soft);font-weight:700}
 .t-big:empty{display:none}
 #timer[data-mode="setup"] .t-move{font-size:clamp(2.3rem,11vw,3.6rem)}
 #timer[data-mode="setup"] .t-x{font-size:1.2rem;line-height:1.4;color:var(--tfg);max-width:28rem}
@@ -203,7 +208,7 @@ const BUYIN=['1 km row','2 km bike','10 min incline walk/jog'];
 const BUYOUT=['1 km row','2 km bike'];
 const WARMUP={t:'warmup',title:'Warm-up',secs:300,text:'5 minutes easy on the rower, bike or elliptical.'};
 const PHONE={t:'Prop your phone up',d:'Somewhere you can see it from every station, with the volume up. It will guide you from here.'};
-const SESS=[
+const SESS1=[
  {id:'upper',name:'Upper',day:'Tue',dur:'~38 min',
   arrive:[
    {t:'Find your corner',d:'Look for a spot where the rower, lat pulldown and a bench are close together. The EMOM moves between all of them every minute.'},
@@ -263,10 +268,85 @@ const SESS=[
   log:[{id:'time',label:'Total time',type:'text',ph:'mm:ss'},{id:'buyIn',label:'Buy-in',type:'choice',opts:BUYIN},{id:'buyOut',label:'Buy-out',type:'choice',opts:BUYOUT},
        {id:'db',label:'Dumbbell weight',type:'text',ph:'e.g. 6 kg'}]}
 ];
-SESS.forEach(s=>s.log.push({id:'notes',label:'Notes',type:'area',ph:'How did it feel? Anything to change next time?'}));
+
+/* Block 2: ladder EMOMs. reps[i] is the target at level i+1; index 6 is the bonus Level 7. */
+const LADDER_TEXT='Every 4-minute round climbs a level (2 more reps or cals). If a station won’t fit inside its minute, tap “Couldn’t finish”: you drop back 2 and keep going to the end. Your level is the last full round you cleared.';
+const SESS2=[
+ {id:'upper',name:'Upper',day:'Tue',dur:'~36 min',ladder:true,
+  arrive:[
+   {t:'Find your corner',d:'You need a rower, a bench and a bit of floor, all close together. Everything else in the EMOM is dumbbells.'},
+   {t:'Rower',d:'Set the monitor to show calories. Do your warm-up on it too.'},
+   {t:'Dumbbells',d:'Grab 2 × {dbRow} for bent-over rows and 2 × {dbPress} for shoulder press. Leave them by the bench.',g:['dbRow','dbPress']},
+   {t:'Bench',d:'Pull a bench close for push-ups. Hands on it if you need to.'},
+   {t:'Later: cables',d:'Note where the cable machine is. The finisher uses it for pushdowns and face pulls.'},
+   PHONE],
+  blocks:[
+  WARMUP,
+  {t:'ladder',title:'Ladder EMOM',text:LADDER_TEXT,moves:[
+   {n:'cal row',reps:[6,8,10,12,14,16,18]},
+   {n:'DB bent-over rows',reps:[8,10,12,14,16,18,20]},
+   {n:'push-ups',x:'Hands on a bench if needed',reps:[8,10,12,14,16,18,20]},
+   {n:'DB shoulder press',reps:[8,10,12,14,16,18,20]}]},
+  {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'12',n:'Cable face pulls'},{r:'30s',n:'Plank',secs:30}],
+   setup:[
+    {t:'Tricep pushdown',d:'Attachment: {pushdown_s}, on the high pulley. Weight: {pushdown}.',g:['pushdown']},
+    {t:'Face pulls',d:'Rope attachment at about head height. Setting: {facepull_s}. Weight: {facepull}.',g:['facepull']},
+    {t:'Curls and plank',d:'Bring 2 × {dbCurl} for curls, and grab a mat for the plank.',g:['dbCurl']}]}],
+  log:[{id:'level',label:'Highest level fully completed',type:'num'}]},
+ {id:'lower',name:'Lower',day:'Thu',dur:'~40 min',ladder:true,
+  arrive:[
+   {t:'Find your spot',d:'Set up beside a bike, with clear floor for lunges and room to swing a kettlebell safely.'},
+   {t:'Bike',d:'Set the display to show calories. Do your warm-up on it too.'},
+   {t:'Kettlebell',d:'Grab the {kb} kettlebell for goblet squats and swings.',g:['kb']},
+   {t:'Later: leg press and a mat',d:'Note where they are. You’ll use them after the EMOM.'},
+   PHONE],
+  blocks:[
+  WARMUP,
+  {t:'ladder',title:'Ladder EMOM',text:LADDER_TEXT,moves:[
+   {n:'cal bike',reps:[6,8,10,12,14,16,18]},
+   {n:'goblet squats',x:'Kettlebell',reps:[8,10,12,14,16,18,20]},
+   {n:'reverse lunges',x:'Total reps, both legs',reps:[8,10,12,14,16,18,20]},
+   {n:'KB swings',reps:[10,12,14,16,18,20,20]}]},
+  {t:'circuit',title:'Leg press',unit:'Set',rounds:2,moves:[{r:'20',n:'Seated leg press',x:'Light'}],
+   setup:[{t:'Seated leg press',d:'Seat: {legpress_s}. Weight: {legpress}. Keep it light for 20 smooth reps.',g:['legpress']}]},
+  {t:'circuit',title:'Abs',rounds:2,moves:[{r:'30s',n:'Plank',secs:30},{r:'12',n:'Dead bugs',x:'6 per side'},{r:'15',n:'Bicycle crunches',x:'Total'},{r:'12',n:'Russian twists',x:'Total, bodyweight or light plate'}],
+   setup:[{t:'Mat',d:'Grab a mat, and a light plate for Russian twists if you want one.'}]}],
+  log:[{id:'level',label:'Highest level fully completed',type:'num'}]},
+ {id:'pilates',name:'Pilates',day:'Fri',dur:'30–40 min',blocks:[
+  {t:'free',title:'Reformer Pilates',text:'Core, glutes and mobility. A class you like or a self-led flow.'}],
+  log:[{id:'what',label:'Class or flow',type:'text',ph:'e.g. Friday reformer class'}]},
+ {id:'full',name:'Full body',day:'Sat',dur:'~40 min',
+  arrive:[
+   {t:'Buy-in: {buyIn}',d:'Find the machine you’ll start on.'},
+   {t:'Your station',d:'Set up right next to a bike. You do 12 cal on it every round.'},
+   {t:'Dumbbells',d:'A light pair, 2 × {dbThruster}, for thrusters. 2 × {dbRow} for rows and 2 × {dbCurl} for curls.',g:['dbThruster','dbRow','dbCurl']},
+   {t:'Goblet squats',d:'The {kb} kettlebell.',g:['kb']},
+   {t:'Mat',d:'A mat for sit-ups.'},
+   {t:'Buy-out: {buyOut}',d:'Note where it is so you can go straight there after round 4.'},
+   PHONE],
+  blocks:[
+  {t:'fortime',title:'Round Off',text:'For time. The clock runs from the start of the buy-in to the end of the buy-out.',rounds:4,moves:[
+   {r:'10',n:'DB thrusters',x:'Light'},{r:'10',n:'DB rows'},{r:'12',n:'Goblet squats'},{r:'14',n:'Alt curls'},{r:'16',n:'Sit-ups'},{r:'12',n:'Cal bike'}]}],
+  log:[{id:'time',label:'Total time',type:'text',ph:'mm:ss'},{id:'buyIn',label:'Buy-in',type:'choice',opts:BUYIN},{id:'buyOut',label:'Buy-out',type:'choice',opts:BUYOUT}]}
+];
+const BLOCKS={
+  1:{name:'Block 1',tag:'EMOM & AMRAP',sess:SESS1,gear:['db','kb','pulldown','cablerow','pushdown','legpress'],rules:[
+    ['Same loads','Both weeks use the same weights. The goal each time is to beat last time.'],
+    ['Kettlebell','Start at 8 kg for goblets and swings. Move to 12 kg once form and pace hold steady.'],
+    ['Dumbbells','A weight you could do 12–15 reps with, leaving about 3 in reserve.']]},
+  2:{name:'Block 2',tag:'Ladder EMOM',sess:SESS2,gear:['dbRow','dbPress','dbCurl','dbThruster','kb','pushdown','facepull','legpress'],rules:[
+    ['Your level','Upper and Lower: log the highest level you fully clear. In week 2, aim for one more.'],
+    ['Level 7','Clear Level 6 in week 1 and week 2 adds a bonus Level 7 round.'],
+    ['Saturday','Log your total time and buy-in/buy-out, then compare with your Block 1 Saturdays.'],
+    ['Loads','Same as Block 1: 12 kg kettlebell, dumbbells for 12–15 reps with about 3 in reserve. Same both weeks.']]}
+};
+const CUR=2,SESS=BLOCKS[CUR].sess;
+[SESS1,SESS2].forEach(L=>L.forEach(s=>s.log.push({id:'notes',label:'Notes',type:'area',ph:'How did it feel? Anything to change next time?'})));
 const ORDER=[];[1,2].forEach(w=>SESS.forEach(s=>ORDER.push({w,s})));
 const byId=id=>SESS.find(s=>s.id===id);
-const key=(w,id)=>'w'+w+'-'+id;
+/* Block 1 keys predate blocks ("w1-upper"); later blocks are prefixed ("b2-w1-upper"). */
+const key=(w,id,b)=>{b=b||CUR;return (b===1?'':'b'+b+'-')+'w'+w+'-'+id};
+const inBlock=(k,b)=>b===1?/^w\d-/.test(k):k.indexOf('b'+b+'-')===0;
 
 /* ---------- storage ---------- */
 const LS='melBlock.v1',LSD='melBlock.drafts',LST='melBlock.timer',LSU='melBlock.ui',LSS='melBlock.sound',LSG='melBlock.gear',LSV='melBlock.voice';
@@ -281,10 +361,18 @@ const GEAR={
   pulldown:{label:'Lat pulldown',step:2.5,set:'Thigh pad setting'},
   cablerow:{label:'Cable row',step:2.5,set:'Seat setting'},
   pushdown:{label:'Tricep pushdown',step:2.5,set:'Rope or bar'},
-  legpress:{label:'Leg press',step:5,set:'Seat setting'}
+  legpress:{label:'Leg press',step:5,set:'Seat setting'},
+  dbRow:{label:'DB rows',note:'each',step:1,from:'db'},
+  dbPress:{label:'DB shoulder press',note:'each',step:1,from:'db'},
+  dbCurl:{label:'DB curls',note:'each',step:1,from:'db'},
+  dbThruster:{label:'DB thrusters',note:'each, light',step:1},
+  facepull:{label:'Cable face pulls',step:2.5,set:'Pulley height'}
 };
 const saveGear=()=>wr(LSG,gear);
-const gw=id=>{const g=gear[id];return g&&g.w!=null&&!isNaN(g.w)?g.w:(GEAR[id].def!=null?GEAR[id].def:null)};
+/* A weight not set yet falls back to its Block 1 equivalent (e.g. DB rows start from the old dumbbell weight), then to a default. */
+const gw=id=>{const g=gear[id];if(g&&g.w!=null&&!isNaN(g.w))return g.w;const G=GEAR[id];if(G.from){const f=gear[G.from];if(f&&f.w!=null&&!isNaN(f.w))return f.w}return G.def!=null?G.def:null};
+/* Block 2 loads: 12 kg kettlebell. Applied once, so she can still change it afterwards. */
+if(!gear._block2){const k=gw('kb');if(k==null||k<12)gear.kb={...(gear.kb||{}),w:12};gear._block2=1;saveGear()}
 const kgs=n=>(Math.round(n*10)/10)+' kg';
 function fill(text,v){
   return String(text).replace(/\{(\w+)\}/g,(m,k)=>{
@@ -346,10 +434,32 @@ const isDone=(w,id)=>!!(entries[key(w,id)]&&entries[key(w,id)].done);
 const nextUp=()=>ORDER.find(o=>!isDone(o.w,o.s.id));
 function summary(id,v){
   if(!v)return'';
+  if(v.level!=null&&v.level!=='')return 'Level '+v.level;
   if(id==='upper')return v.emom?'Time spare: '+v.emom.toLowerCase():'';
   if(id==='lower'){const a=[];if(v.rounds!==''&&v.rounds!=null)a.push(v.rounds+' rounds'+(+v.reps?' + '+v.reps+' reps':''));if(v.dist)a.push(v.dist);return a.join(' · ')}
   if(id==='full')return[v.time,(v.buyIn&&v.buyOut)?v.buyIn+' / '+v.buyOut:''].filter(Boolean).join(' · ');
   return v.what||'';
+}
+const levelOf=e=>e&&e.vals&&e.vals.level!=null&&e.vals.level!==''&&!isNaN(+e.vals.level)?+e.vals.level:null;
+/* Week 2 adds the bonus Level 7 round when week 1 cleared Level 6. */
+const hasL7=(sid,w)=>w===2&&(levelOf(entries[key(1,sid)])||0)>=6;
+function timeWithPicks(e){const v=e&&e.vals;return v&&v.time?v.time+(v.buyIn?' ('+v.buyIn+' / '+(v.buyOut||'?')+')':''):''}
+/* The score to beat for a session: {label, goal} or null. */
+function target(s,w){
+  const prev=w===2?entries[key(1,s.id)]:null;
+  if(s.ladder){
+    const l=levelOf(prev);if(l==null)return null;
+    return {label:'Week 1: Level '+l,goal:l>=6?'Bonus Level 7 round unlocked. Clear it.':'Goal: clear Level '+(l+1)+'.'};
+  }
+  if(s.id==='full'&&CUR>1){
+    const past=[1,2].map(x=>timeWithPicks(entries[key(x,'full',CUR-1)])).filter(Boolean);
+    const wk1=w===2?timeWithPicks(prev):'';
+    if(!past.length&&!wk1)return null;
+    return {label:wk1?'Week 1: '+wk1:BLOCKS[CUR-1].name+': '+past.join(' · '),
+      goal:(wk1&&past.length?BLOCKS[CUR-1].name+': '+past.join(' · ')+'. ':'')+'Same buy-in and buy-out for a fair comparison.'};
+  }
+  const ps=prev&&summary(s.id,prev.vals);
+  return ps?{label:'Week 1: '+ps,goal:'Same loads. Go for better.'}:null;
 }
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
 
@@ -371,10 +481,10 @@ function viewHome(){
   const bars=[1,2].map(w=>'<div class="wk">'+SESS.map(s=>'<i class="'+(isDone(w,s.id)?'on':'')+'"></i>').join('')+'</div>').join('');
   let hero;
   if(n){
-    const prev=n.w===2?entries[key(1,n.s.id)]:null,ps=prev&&summary(n.s.id,prev.vals);
+    const tg=target(n.s,n.w);
     hero='<section class="hero"><div class="eyebrow">Next up · Week '+n.w+'</div><h2>'+esc(n.s.name)+'</h2>'
       +'<p class="meta">'+n.s.day+' · '+n.s.dur+'</p>'
-      +(ps?'<p class="last">Week 1: <b>'+esc(ps)+'</b>. Beat it.</p>':'')
+      +(tg?'<p class="last"><b>'+esc(tg.label)+'</b><br>'+esc(tg.goal)+'</p>':'')
       +'<button class="btn full" data-act="open" data-w="'+n.w+'" data-s="'+n.s.id+'">Start '+esc(n.s.name.toLowerCase())+'</button></section>';
   }else hero='<section class="hero"><div class="eyebrow">Block complete</div><h2>All 8 done</h2><p class="meta">Check your scores to see what improved from week 1 to week 2.</p><button class="btn full" data-act="scores">See scores</button></section>';
   const weeks=[1,2].map(w=>'<section class="week"><h2>Week '+w+'<span class="small muted num">'+SESS.filter(s=>isDone(w,s.id)).length+' / 4</span></h2><div>'
@@ -382,17 +492,14 @@ function viewHome(){
       const meta=e&&e.done?(summary(s.id,e.vals)||'Done')+(e.date?' · '+new Date(e.date).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''):s.dur;
       return '<button class="row'+(isN?' next':'')+'" data-act="open" data-w="'+w+'" data-s="'+s.id+'"><span class="day">'+s.day+'</span><span class="body"><span class="name">'+esc(s.name)+'</span><br><span class="meta">'+esc(meta)+'</span></span><span class="tick'+(e&&e.done?' on':'')+'" aria-label="'+(e&&e.done?'Done':'Not done')+'">'+CHECK+'</span></button>'}).join('')
     +'</div></section>').join('');
-  return '<header class="top"><div class="eyebrow">2-week block · local gym</div><h1>Mel’s Training</h1>'
+  const B=BLOCKS[CUR],rules=[['Missed a day','Pick it up at the next session. The block just runs a little longer.']].concat(B.rules,[['Machines','Keep machines and cables light and steady.']]);
+  return '<header class="top"><div class="eyebrow">'+B.name+' · '+B.tag+'</div><h1>Mel’s Training</h1>'
     +'<div class="progline"><span class="small muted num">'+done+' of 8 sessions done</span><button class="linkbtn" data-act="scores">Scores</button></div><div class="prog">'+bars+'</div></header>'
     +hero+weeks
-    +'<section class="panel"><h2>How the block works</h2><ul class="rules">'
-    +'<li><b>Missed a day</b><span>Pick it up at the next session. The block just runs a little longer.</span></li>'
-    +'<li><b>Same loads</b><span>Both weeks use the same weights. The goal each time is to beat last time.</span></li>'
-    +'<li><b>Kettlebell</b><span>Start at 8 kg for goblets and swings. Move to 12 kg once form and pace hold steady.</span></li>'
-    +'<li><b>Dumbbells</b><span>A weight you could do 12–15 reps with, leaving about 3 in reserve.</span></li>'
-    +'<li><b>Machines</b><span>Keep machines and cables light and steady.</span></li></ul></section>'
+    +'<section class="panel"><h2>How '+B.name+' works</h2><ul class="rules">'
+    +rules.map(r=>'<li><b>'+r[0]+'</b><span>'+r[1]+'</span></li>').join('')+'</ul></section>'
     +'<section class="panel"><h2>Weights &amp; settings</h2><p class="small muted">Set these once. The setup steps tell you what to grab, and + moves a weight up when it’s time.</p>'
-    +'<div>'+Object.keys(GEAR).map(id=>gearRow(id,'')).join('')+'</div>'
+    +'<div>'+B.gear.map(id=>gearRow(id,'')).join('')+'</div>'
     +'<div class="grow"><div class="gline"><span class="glabel">Timer sounds</span><span class="chips"><button class="chip'+(sound?' sel':'')+'" data-act="t-sound" aria-pressed="'+sound+'">Beeps '+(sound?'on':'off')+'</button>'
     +'<button class="chip'+(voice?' sel':'')+'" data-act="t-voice" aria-pressed="'+voice+'">Voice '+(voice?'on':'off')+'</button></span></div>'
     +'<p class="small muted">Voice reads out each setup step and what’s next, so you don’t have to look at your phone.</p></div></section>'
@@ -400,8 +507,8 @@ function viewHome(){
 }
 function footer(){
   return '<footer class="foot"><span>'+(sync==='synced'?'Scores saved and synced.':'Scores are saved on this phone.')+'</span>'
-   +(confirmReset?'<div class="confirm"><span>Clear every logged session and start a fresh block?</span><div class="chips"><button class="btn" data-act="reset-yes">Clear and start again</button><button class="btn ghost" data-act="reset-no">Keep</button></div></div>'
-   :'<button class="linkbtn" data-act="reset-ask">Start a new block</button>')+'</footer>';
+   +(confirmReset?'<div class="confirm"><span>Clear everything logged in '+BLOCKS[CUR].name+' and start it again? Earlier blocks are kept.</span><div class="chips"><button class="btn" data-act="reset-yes">Clear and restart</button><button class="btn ghost" data-act="reset-no">Keep</button></div></div>'
+   :'<button class="linkbtn" data-act="reset-ask">Restart '+BLOCKS[CUR].name+'</button>')+'</footer>';
 }
 
 function blockBody(s,b,bi,k){
@@ -414,6 +521,13 @@ function blockBody(s,b,bi,k){
     h+='<div class="pick"><span class="eyebrow">Buy-out · choose 1</span><div class="chips">'+BUYOUT.map(o=>'<button class="chip'+(v.buyOut===o?' sel':'')+'" data-act="pick" data-f="buyOut" data-v="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div></div>';
     if(ui.w===2&&entries[key(1,s.id)])h+='<p class="small muted">Pick the same buy-in and buy-out as week 1 so the times compare fairly.</p>';
     h+='<button class="btn full" data-act="start" data-bi="'+bi+'"'+(v.buyIn&&v.buyOut?'':' disabled')+'>'+(v.buyIn&&v.buyOut?'Start the clock':'Choose a buy-in and buy-out')+'</button>';
+  }else if(b.t==='ladder'){
+    const n=hasL7(s.id,ui.w)?7:6,pl=ui.w===2?levelOf(entries[key(1,s.id)]):null,goal=pl==null?null:Math.min(n,pl+1);
+    h+='<div class="tablewrap"><table class="ladder"><thead><tr><th>Level</th>'+b.moves.map(m=>'<th>'+esc(m.n)+'</th>').join('')+'</tr></thead><tbody>'
+      +Array.from({length:n},(_,i)=>'<tr'+(goal===i+1?' class="goal"':'')+'><td>'+(i+1)+(i===6?' <span class="gnote">bonus</span>':'')+(goal===i+1?' <span class="gnote">goal</span>':'')+'</td>'
+        +b.moves.map(m=>'<td>'+m.reps[i]+'</td>').join('')+'</tr>').join('')
+      +'</tbody></table></div>';
+    h+='<button class="btn full" data-act="start" data-bi="'+bi+'">Start ladder EMOM · '+(n*4)+' min</button>';
   }else{
     if(b.moves)h+='<ul class="moves">'+moveList(b.moves)+'</ul>';
     if(b.t==='circuit'){
@@ -435,15 +549,17 @@ function viewSession(){
   const s=byId(ui.sid),w=ui.w,k=key(w,s.id),d=draft(k),e=entries[k],prev=w===2?entries[key(1,s.id)]:null;
   if(!d.init){d.init=1;
     if(e&&e.vals)d.vals={...e.vals};
-    if(prev&&prev.vals&&s.id==='full'){if(!d.vals.buyIn)d.vals.buyIn=prev.vals.buyIn;if(!d.vals.buyOut)d.vals.buyOut=prev.vals.buyOut}
+    /* Saturday picks default to last time's, so times compare fairly: week 1 of this block, else the previous block. */
+    const pick=s.id==='full'?[prev,entries[key(2,'full',CUR-1)],entries[key(1,'full',CUR-1)]].find(x=>x&&x.vals&&x.vals.buyIn):null;
+    if(pick){if(!d.vals.buyIn)d.vals.buyIn=pick.vals.buyIn;if(!d.vals.buyOut)d.vals.buyOut=pick.vals.buyOut}
     if(!d.vals.db&&gw('db')!=null&&s.log.some(f=>f.id==='db'))d.vals.db=kgs(gw('db'));
     if(!d.vals.kb&&s.log.some(f=>f.id==='kb')&&['8 kg','12 kg'].includes(kgs(gw('kb'))))d.vals.kb=kgs(gw('kb'));
     saveDrafts();
   }
-  const ps=prev&&summary(s.id,prev.vals);
+  const tg=target(s,w);
   let h='<button class="back" data-act="home">‹ All sessions</button>'
-   +'<header class="shead"><div class="eyebrow">Week '+w+' · '+s.day+' · '+s.dur+'</div><h1>'+esc(s.name)+'</h1></header>';
-  if(ps)h+='<div class="beat"><span class="eyebrow">Week 1 score</span><b>'+esc(ps)+'</b><span class="small">Same loads. Go for better.</span></div>';
+   +'<header class="shead"><div class="eyebrow">'+BLOCKS[CUR].name+' · Week '+w+' · '+s.day+' · '+s.dur+'</div><h1>'+esc(s.name)+'</h1></header>';
+  if(tg)h+='<div class="beat"><span class="eyebrow">To beat</span><b>'+esc(tg.label)+'</b><span class="small">'+esc(tg.goal)+'</span></div>';
   if(s.arrive){
     const needPick=s.id==='full'&&!(d.vals.buyIn&&d.vals.buyOut);
     h+='<section class="hero"><div class="eyebrow">Guided session</div>'
@@ -474,24 +590,32 @@ app.addEventListener('input',ev=>{
   draft(key(ui.w,ui.sid)).vals[f]=ev.target.value;saveDrafts();
 });
 
-const METRICS=[
-  {s:'upper',label:'Finished each EMOM minute with time spare?',get:v=>v.emom,score:v=>({'Every minute':3,'Most minutes':2,'Not yet':1})[v.emom]},
-  {s:'lower',label:'AMRAP rounds completed',get:v=>(v.rounds!==''&&v.rounds!=null)?v.rounds+(+v.reps?' + '+v.reps+' reps':''):'',score:v=>v.rounds===''||v.rounds==null?null:(+v.rounds)*1000+(+v.reps||0)},
-  {s:'lower',label:'Elliptical finisher distance',get:v=>v.dist,score:v=>{const n=parseFloat(v.dist);return isNaN(n)?null:n}},
-  {s:'full',label:'Total time (buy-in / buy-out)',get:v=>v.time?v.time+(v.buyIn?' · '+v.buyIn+' / '+(v.buyOut||'?'):''):'',score:v=>{const t=toSec(v.time);return t==null?null:-t}},
-];
+const TIME_METRIC={s:'full',label:'Total time (buy-in / buy-out)',get:v=>v.time?v.time+(v.buyIn?' · '+v.buyIn+' / '+(v.buyOut||'?'):''):'',score:v=>{const t=toSec(v.time);return t==null?null:-t}};
+const LEVEL_METRIC=s=>({s,label:'Highest ladder level cleared',get:v=>v.level!==''&&v.level!=null?'Level '+v.level:'',score:v=>v.level===''||v.level==null?null:+v.level});
+const METRICS={
+  1:[
+    {s:'upper',label:'Finished each EMOM minute with time spare?',get:v=>v.emom,score:v=>({'Every minute':3,'Most minutes':2,'Not yet':1})[v.emom]},
+    {s:'lower',label:'AMRAP rounds completed',get:v=>(v.rounds!==''&&v.rounds!=null)?v.rounds+(+v.reps?' + '+v.reps+' reps':''):'',score:v=>v.rounds===''||v.rounds==null?null:(+v.rounds)*1000+(+v.reps||0)},
+    {s:'lower',label:'Elliptical finisher distance',get:v=>v.dist,score:v=>{const n=parseFloat(v.dist);return isNaN(n)?null:n}},
+    TIME_METRIC],
+  2:[LEVEL_METRIC('upper'),LEVEL_METRIC('lower'),TIME_METRIC]
+};
 function viewScores(){
-  const rows=METRICS.map(m=>{
-    const a=entries[key(1,m.s)],b=entries[key(2,m.s)];
+  const sb=BLOCKS[ui.sb]?+ui.sb:CUR,names={upper:'Upper',lower:'Lower',full:'Full body'};
+  const rows=METRICS[sb].map(m=>{
+    const a=entries[key(1,m.s,sb)],b=entries[key(2,m.s,sb)];
     const av=a&&a.vals?m.get(a.vals):'',bv=b&&b.vals?m.get(b.vals):'';
-    const sa=a&&a.vals?m.score(a.vals):null,sb=b&&b.vals?m.score(b.vals):null;
+    const sa=a&&a.vals?m.score(a.vals):null,sbv=b&&b.vals?m.score(b.vals):null;
     const fair=m.s!=='full'||!a||!b||(a.vals.buyIn===b.vals.buyIn&&a.vals.buyOut===b.vals.buyOut);
-    const better=sa!=null&&sb!=null&&sb>sa&&fair;
-    return '<tr><td><b>'+esc(byId(m.s).name)+'</b><br><span class="small muted">'+esc(m.label)+'</span></td><td class="val">'+(esc(av)||'<span class="muted">–</span>')+'</td><td class="val">'+(esc(bv)||'<span class="muted">–</span>')
+    const better=sa!=null&&sbv!=null&&sbv>sa&&fair;
+    return '<tr><td><b>'+names[m.s]+'</b><br><span class="small muted">'+esc(m.label)+'</span></td><td class="val">'+(esc(av)||'<span class="muted">–</span>')+'</td><td class="val">'+(esc(bv)||'<span class="muted">–</span>')
       +(better?'<br><span class="better">Beat it</span>':'')+(!fair?'<br><span class="small muted">Different buy-in/out</span>':'')+'</td></tr>'}).join('');
+  const prevSat=sb>1?[1,2].map(w=>{const t=timeWithPicks(entries[key(w,'full',sb-1)]);return t?'week '+w+' '+t:''}).filter(Boolean):[];
   return '<button class="back" data-act="home">‹ All sessions</button><header class="shead"><div class="eyebrow">Week 1 vs week 2</div><h1>Scores</h1></header>'
+   +'<div class="chips" role="tablist">'+Object.keys(BLOCKS).map(Number).sort((x,y)=>y-x).map(n=>'<button class="chip'+(n===sb?' sel':'')+'" role="tab" aria-selected="'+(n===sb)+'" data-act="score-block" data-b="'+n+'">'+BLOCKS[n].name+'</button>').join('')+'</div>'
    +'<div class="tablewrap"><table><thead><tr><th>Session</th><th>Week 1</th><th>Week 2</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
-   +'<p class="small muted">Pilates: '+[1,2].map(w=>'week '+w+' '+(isDone(w,'pilates')?'done':'not yet')).join(', ')+'.</p>';
+   +(prevSat.length?'<p class="small muted">'+BLOCKS[sb-1].name+' Saturday: '+esc(prevSat.join(' · '))+'</p>':'')
+   +'<p class="small muted">Pilates: '+[1,2].map(w=>{const e=entries[key(w,'pilates',sb)];return 'week '+w+' '+(e&&e.done?'done':'not yet')}).join(', ')+'.</p>';
 }
 
 /* ---------- timer ---------- */
@@ -521,6 +645,7 @@ function setupSpeech(){const st=T.steps[T.idx],v=setupVals();return fill(st.t,v)
 function introText(){
   if(T.type==='setup')return setupSpeech();
   if(T.type==='emom'||T.type==='amrap')return T.label+'. First: '+T.moves[0].r+' '+T.moves[0].n;
+  if(T.type==='ladder')return 'Ladder. Level 1. First: '+lmove(T.moves[0],1);
   if(T.type==='intervals')return 'Intervals. Hard first.';
   if(T.type==='fortime')return T.label+'. Buy-in: '+T.steps[0].text;
   if(T.type==='steps')return T.label+'. '+stepSpeech(T.steps[0]);
@@ -545,8 +670,15 @@ function afterSetup(){
   ui={view:'session',w:a.w,sid:a.sid};saveUi();render();
   if(canRun(a.sid,a.w,a.bi))startPart(a.sid,a.w,a.bi,!a.arrive);
 }
+/* Ladder reps at a level; Level 0 (dropped below Level 1) is 2 under Level 1. */
+const lreps=(mv,L)=>L>=1?mv.reps[L-1]:mv.reps[0]-2;
+const lmove=(mv,L)=>lreps(mv,L)+' '+mv.n;
+/* The level being worked in round r: the round number, unless she has dropped back. */
+const lwork=r=>T.cap!=null?Math.min(r,T.cap):r;
 function blockTimer(sid,w,bi){
-  const s=byId(sid),b=s.blocks[bi],ref={k:key(w,sid),bi},title=s.name+' · '+b.title;
+  const s=byId(sid),b=s.blocks[bi],ref={k:key(w,sid),bi,sid,w},title=s.name+' · '+b.title;
+  if(b.t==='ladder'){const n=hasL7(sid,w)?7:6;
+    return startTimer({type:'ladder',rounds:n,moves:b.moves,label:'Ladder EMOM'+(n===7?' + Level 7':''),cap:null,level:null,undo:null,ref,title})}
   if(b.t==='warmup')return startTimer({type:'countdown',secs:b.secs,label:'Warm-up',move:'Warm-up',x:b.text,ref,title});
   if(b.t==='emom')return startTimer({type:'emom',rounds:b.rounds,moves:b.moves,label:b.title,ref,title});
   if(b.t==='amrap')return startTimer({type:'amrap',secs:b.secs,moves:b.moves,label:b.title,ref,title});
@@ -607,6 +739,11 @@ function renderCtrl(){
     c.innerHTML='<div class="t-confirm"><span>Stop the timer here?</span><div class="t-ctrl"><button class="t-btn" data-act="t-keep">Keep going</button><button class="t-btn" data-act="t-end">Stop here</button></div></div>';return;
   }
   let main='';
+  if(T.type==='ladder'){
+    c.innerHTML='<div class="t-ctrl"><button class="t-btn fail wide" data-act="t-fail">Couldn’t finish · drop back 2</button>'
+      +(T.undo?'<button class="t-btn wide" data-act="t-undo">Undo drop</button>':'')
+      +'<button class="t-btn" data-act="t-pause">'+(T.pausedAt?'Resume':'Pause')+'</button><button class="t-btn" data-act="t-stop">Stop</button></div>';return;
+  }
   if(T.type==='amrap')main='<button class="t-btn go wide" data-act="t-plus">+1 round</button>';
   if(T.type==='fortime')main='<button class="t-btn go wide" data-act="t-next">Done · next</button>';
   if(T.type==='steps'){const st=T.steps[T.idx];
@@ -616,15 +753,17 @@ function renderCtrl(){
   c.innerHTML='<div class="t-ctrl">'+main+'<button class="t-btn" data-act="t-pause">'+(T.pausedAt?'Resume':'Pause')+'</button>'+(extra||'')+'<button class="t-btn'+(extra?' wide':'')+'" data-act="t-stop">Stop</button></div>';
 }
 function nextPart(){
-  if(!T||!T.ref)return null;
-  const p=T.ref.k.split('-'),s=byId(p[1]),bi=T.ref.bi+1;
-  return s&&s.blocks[bi]?{w:+p[0].slice(1),s,bi,b:s.blocks[bi]}:null;
+  if(!T||!T.ref||!T.ref.sid)return null;
+  const s=byId(T.ref.sid),bi=T.ref.bi+1;
+  return s&&s.blocks[bi]?{w:T.ref.w,s,bi,b:s.blocks[bi]}:null;
 }
+const ladderLevel=()=>T.level!=null?T.level:T.rounds;
 function saveTimerResult(){
   const r=T.ref,d=draft(r.k);d.done[r.bi]=true;
   if(T.type==='amrap')d.vals.rounds=String(T.count);
+  if(T.type==='ladder')d.vals.level=String(ladderLevel());
   if(T.type==='fortime'&&T.idx>=T.steps.length)d.vals.time=fmt(T.fin.e);
-  if(T.type==='steps'&&T.idx>=T.steps.length)d.rounds[r.bi]=byId(r.k.split('-')[1]).blocks[r.bi].rounds;
+  if(T.type==='steps'&&T.idx>=T.steps.length&&r.sid)d.rounds[r.bi]=byId(r.sid).blocks[r.bi].rounds;
   saveDrafts();
 }
 function setT(id,v){const n=document.getElementById(id);if(n&&n.textContent!==v)n.textContent=v}
@@ -633,7 +772,7 @@ function finish(){
   T.fin={e:Math.max(0,elapsed())};T.confirm=false;if(!T.pausedAt)T.pausedAt=Date.now();
   saveT();long();setTimeout(long,600);renderCtrl();renderExtra();tick();
   const np=nextPart();
-  say(!T.ref?'Done.':(T.type==='amrap'?T.count+' rounds. ':'')+(T.type==='intervals'?'Done. Check your distance.':'Done.')
+  say(!T.ref?'Done.':(T.type==='amrap'?T.count+' rounds. ':'')+(T.type==='ladder'?'Level '+ladderLevel()+'. ':'')+(T.type==='intervals'?'Done. Check your distance.':'Done.')
     +(np?' Next up: '+np.b.title+'.':' Session complete. Log your scores.'));
 }
 function advance(){
@@ -658,11 +797,13 @@ function tick(){
     else if(T.type==='fortime'){big=fmt(T.fin.e);move=T.idx>=T.steps.length?'Finished':'Stopped';x=T.idx>=T.steps.length?'Total time':'Stopped at step '+(T.idx+1)+' of '+T.steps.length}
     else if(T.type==='intervals'){big=fmt(T.fin.e);move='Intervals done';x='Check the distance on the elliptical.'}
     else if(T.type==='steps'){big=fmt(T.fin.e);move=T.label+' done'}
+    else if(T.type==='ladder'){const l=ladderLevel();big=String(l);move=l>0?'Level '+l+' cleared':'Level 1 next time';
+      x=T.cap!=null?'Dropped back at Level '+(T.level+1)+' and finished the time.':'Every round cleared.'}
     else{big=fmt(T.fin.e);move=T.type==='emom'?'EMOM done':'Done'}
     sub=T.title||'';
   }else if(e<0){
     big=String(Math.ceil(-e));move='Get ready';
-    const f=T.type==='emom'||T.type==='amrap'?T.moves[0].r+' '+T.moves[0].n:T.type==='fortime'?T.steps[0].text:T.type==='intervals'?'Hard first':'';
+    const f=T.type==='emom'||T.type==='amrap'?T.moves[0].r+' '+T.moves[0].n:T.type==='ladder'?lmove(T.moves[0],1):T.type==='fortime'?T.steps[0].text:T.type==='intervals'?'Hard first':'';
     next=f?'First: '+f:'';
     if(crossed&&s>=-3)short();
   }else if(T.type==='emom'){
@@ -673,6 +814,16 @@ function tick(){
     next=m+1<T.rounds*L?'Next: '+nm.r+' '+nm.n:'Last minute';
     sub='Minute '+(m+1)+' of '+(T.rounds*L)+' · Round '+(Math.floor(m/L)+1)+' of '+T.rounds;bar=e/total;
     if(crossed){const r=s%60;if(r===0)long();else if(r>=57)short();if(r===50&&m+1<T.rounds*L)say('Next: '+nm.r+' '+nm.n)}
+  }else if(T.type==='ladder'){
+    const L=T.moves.length,mins=T.rounds*L,total=mins*60;
+    if(e>=total){finish();return}
+    const m=Math.floor(e/60),r=Math.floor(m/L)+1,wl=lwork(r),mv=T.moves[m%L];
+    const m2=m+1,r2=Math.floor(m2/L)+1,wl2=lwork(r2),nm=T.moves[m2%L];
+    big=fmt(Math.ceil(60-(e-m*60)));move=lmove(mv,wl);x=mv.x||'';
+    next=m2<mins?'Next: '+lmove(nm,wl2)+(wl2!==wl?' · Level '+wl2:''):'Last minute';
+    sub='Round '+r+' of '+T.rounds+' · Level '+wl+(T.cap!=null?' (dropped back)':'')+' · Minute '+(m%L+1)+' of '+L;bar=e/total;
+    if(crossed){const sec=s%60;if(sec===0)long();else if(sec>=57)short();
+      if(sec===50&&m2<mins)say((wl2!==wl?'Level '+wl2+'. ':'')+'Next: '+lmove(nm,wl2))}
   }else if(T.type==='amrap'){
     if(e>=T.secs){finish();return}
     big=fmt(Math.ceil(T.secs-e));move=T.count+(T.count===1?' round':' rounds');sub=fmt(e)+' gone';bar=e/T.secs;
@@ -740,7 +891,9 @@ document.addEventListener('click',ev=>{
     case 'reset-ask':confirmReset=true;return render();
     case 'reset-no':confirmReset=false;return render();
     case 'reset-yes':{
-      const ks=Object.keys(entries);entries={};drafts={};saveLocal();saveDrafts();confirmReset=false;
+      const ks=Object.keys(entries).filter(x=>inBlock(x,CUR));
+      ks.forEach(x=>{delete entries[x]});Object.keys(drafts).filter(x=>inBlock(x,CUR)).forEach(x=>{delete drafts[x]});
+      saveLocal();saveDrafts();confirmReset=false;
       if(db)ks.forEach(x=>{db.doc('log/'+x).delete().catch(()=>{})});
       toast('New block started');return render();
     }
@@ -758,6 +911,16 @@ document.addEventListener('click',ev=>{
     case 't-stop':T.confirm=true;return renderCtrl();
     case 't-keep':T.confirm=false;return renderCtrl();
     case 't-end':return finish();
+    case 't-fail':{
+      const e=elapsed();if(e<0)return;
+      const r=Math.floor(Math.floor(e/60)/T.moves.length)+1;
+      T.undo={cap:T.cap,level:T.level};
+      if(T.cap==null){T.level=r-1;T.cap=r-1}else T.cap=Math.max(0,lwork(r)-1);
+      saveT();renderCtrl();short();
+      say('Dropping back to level '+T.cap+'. '+(T.level>0?'Level '+T.level+' logged.':'Keep going.'));return tick();
+    }
+    case 't-undo':if(T.undo){T.cap=T.undo.cap;T.level=T.undo.level;T.undo=null;saveT();renderCtrl()}return tick();
+    case 'score-block':ui.sb=+b.dataset.b;saveUi();return render();
     case 't-plus':T.count++;saveT();short();return tick();
     case 't-minus':T.count=Math.max(0,T.count-1);saveT();return tick();
     case 't-stepgo':T.stepAt=Math.max(0,elapsed());T._lr=null;saveT();short();return renderCtrl();
