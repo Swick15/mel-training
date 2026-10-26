@@ -154,6 +154,7 @@ td.val{font-variant-numeric:tabular-nums;font-weight:600;min-width:6.5rem}
 .t-confirm{display:grid;gap:10px;background:color-mix(in srgb,var(--tfg) 10%,transparent);border-radius:14px;padding:14px}
 .t-tog{display:flex;gap:6px;flex:none}
 .t-btn.fail{border-color:var(--tfg);min-height:64px;font-size:1.1rem}
+.t-btn small{font-family:var(--body);font-size:.8rem;font-weight:600;text-transform:none;letter-spacing:0;opacity:.75}
 table.ladder th,table.ladder td{text-align:center;padding:8px 6px;font-variant-numeric:tabular-nums}
 table.ladder th:first-child,table.ladder td:first-child{text-align:left}
 table.ladder th{text-transform:none;letter-spacing:.02em;font-size:.75rem}
@@ -254,13 +255,14 @@ const SESS1=[
 ];
 
 /* Block 2: ladder EMOMs. reps[i] is the target at level i+1; index 6 is the bonus Level 7. */
-const LADDER_TEXT='Every 4-minute round climbs a level (2 more reps or cals). If a station won’t fit inside its minute, tap “Couldn’t finish”: you drop back 2 and keep going to the end. Your level is the last full round you cleared.';
+const LADDER_TEXT='Every 4-minute round climbs a level (2 more reps or cals). If a station won’t fit inside its minute, tap “Couldn’t finish” and either drop the weight (you keep climbing, and it still counts) or drop back 2 reps. Work at max effort to the end. Start lighter than you think: round 4 onwards gets heavy fast.';
+const START_LIGHT=' Start lighter than you think. Round 4 onwards gets heavy fast.';
 const SESS2=[
  {id:'upper',name:'Upper',day:'Tue',dur:'~36 min',ladder:true,
   arrive:[
    {t:'Find your corner',d:'You need a rower, a bench and a bit of floor, all close together. Everything else in the EMOM is dumbbells.'},
    {t:'Rower',d:'Set the monitor to show calories. Do your warm-up on it too.'},
-   {t:'Dumbbells',d:'Grab 2 × {dbRow} for bent-over rows and 2 × {dbPress} for shoulder press. Leave them by the bench.',g:['dbRow','dbPress']},
+   {t:'Dumbbells',d:'Grab 2 × {dbRow} for bent-over rows and 2 × {dbPress} for shoulder press. Leave them by the bench, with the next pair down close by.'+START_LIGHT,g:['dbRow','dbPress']},
    {t:'Bench',d:'Pull a bench close for push-ups. Hands on it if you need to.'},
    {t:'Later: cables',d:'Note where the cable machine is. The finisher uses it for pushdowns and face pulls.'},
    PHONE],
@@ -268,15 +270,15 @@ const SESS2=[
   WARMUP,
   {t:'ladder',title:'Ladder EMOM',text:LADDER_TEXT,moves:[
    {n:'cal row',reps:[6,8,10,12,14,16,18]},
-   {n:'DB bent-over rows',reps:[8,10,12,14,16,18,20]},
+   {n:'DB bent-over rows',g:'dbRow',reps:[8,10,12,14,16,18,20]},
    {n:'push-ups',x:'Hands on a bench if needed',reps:[8,10,12,14,16,18,20]},
-   {n:'DB shoulder press',reps:[8,10,12,14,16,18,20]}]},
+   {n:'DB shoulder press',g:'dbPress',reps:[8,10,12,14,16,18,20]}]},
   {t:'circuit',title:'Finisher',rounds:2,moves:[{r:'12',n:'Cable tricep pushdowns'},{r:'12',n:'DB curls'},{r:'12',n:'Cable face pulls'},{r:'30s',n:'Plank',secs:30}],
    setup:[
     {t:'Tricep pushdown',d:'Attachment: {pushdown_s}, on the high pulley. Weight: {pushdown}.',g:['pushdown']},
     {t:'Face pulls',d:'Rope attachment at about head height. Setting: {facepull_s}. Weight: {facepull}.',g:['facepull']},
     {t:'Curls and plank',d:'Bring 2 × {dbCurl} for curls, and grab a mat for the plank.',g:['dbCurl']}]}],
-  log:[{id:'level',label:'Highest level fully completed',type:'num'}]},
+  log:[{id:'level',label:'Highest level fully completed',type:'num'},{id:'drops',label:'Weight dropped during the EMOM',type:'text',ph:'e.g. DB press 5 → 4 kg in round 4'}]},
  {id:'lower',name:'Lower',day:'Thu',dur:'~40 min',ladder:true,
   arrive:[
    {t:'Find your spot',d:'Set up beside a bike, with clear floor for lunges and room to swing a kettlebell safely.'},
@@ -288,14 +290,14 @@ const SESS2=[
   WARMUP,
   {t:'ladder',title:'Ladder EMOM',text:LADDER_TEXT,moves:[
    {n:'cal bike',reps:[6,8,10,12,14,16,18]},
-   {n:'goblet squats',x:'Kettlebell',reps:[8,10,12,14,16,18,20]},
+   {n:'goblet squats',g:'kb',reps:[8,10,12,14,16,18,20]},
    {n:'reverse lunges',x:'Total reps, both legs',reps:[8,10,12,14,16,18,20]},
-   {n:'KB swings',reps:[10,12,14,16,18,20,20]}]},
+   {n:'KB swings',g:'kb',reps:[10,12,14,16,18,20,20]}]},
   {t:'circuit',title:'Leg press',unit:'Set',rounds:2,moves:[{r:'20',n:'Seated leg press',x:'Light'}],
    setup:[{t:'Seated leg press',d:'Seat: {legpress_s}. Weight: {legpress}. Keep it light for 20 smooth reps.',g:['legpress']}]},
   {t:'circuit',title:'Abs',rounds:2,moves:[{r:'30s',n:'Plank',secs:30},{r:'12',n:'Dead bugs',x:'6 per side'},{r:'15',n:'Bicycle crunches',x:'Total'},{r:'12',n:'Russian twists',x:'Total, bodyweight or light plate'}],
    setup:[{t:'Mat',d:'Grab a mat, and a light plate for Russian twists if you want one.'}]}],
-  log:[{id:'level',label:'Highest level fully completed',type:'num'}]},
+  log:[{id:'level',label:'Highest level fully completed',type:'num'},{id:'drops',label:'Weight dropped during the EMOM',type:'text',ph:'e.g. DB press 5 → 4 kg in round 4'}]},
  {id:'pilates',name:'Pilates',day:'Fri',dur:'30–40 min',blocks:[
   {t:'free',title:'Reformer Pilates',text:'Core, glutes and mobility. A class you like or a self-led flow.'}],
   log:[{id:'what',label:'Class or flow',type:'text',ph:'e.g. Friday reformer class'}]},
@@ -418,7 +420,7 @@ const isDone=(w,id)=>!!(entries[key(w,id)]&&entries[key(w,id)].done);
 const nextUp=()=>ORDER.find(o=>!isDone(o.w,o.s.id));
 function summary(id,v){
   if(!v)return'';
-  if(v.level!=null&&v.level!=='')return 'Level '+v.level;
+  if(v.level!=null&&v.level!=='')return 'Level '+v.level+(v.drops?' · weight dropped':'');
   if(id==='upper')return v.emom?'Time spare: '+v.emom.toLowerCase():'';
   if(id==='lower'){const a=[];if(v.rounds!==''&&v.rounds!=null)a.push(v.rounds+' rounds'+(+v.reps?' + '+v.reps+' reps':''));if(v.dist)a.push(v.dist);return a.join(' · ')}
   if(id==='full')return[v.time,(v.buyIn&&v.buyOut)?v.buyIn+' / '+v.buyOut:''].filter(Boolean).join(' · ');
@@ -433,7 +435,9 @@ function target(s,w){
   const prev=w===2?entries[key(1,s.id)]:null;
   if(s.ladder){
     const l=levelOf(prev);if(l==null)return null;
-    return {label:'Week 1: Level '+l,goal:l>=6?'Bonus Level 7 round unlocked. Clear it.':'Goal: clear Level '+(l+1)+'.'};
+    const dr=prev.vals.drops;
+    return {label:'Week 1: Level '+l,goal:(l>=6?'Bonus Level 7 round unlocked. Clear it.':'Goal: clear Level '+(l+1)+'.')
+      +(dr?' Week 1 drops: '+dr+'. Holding the weight longer is a win too.':'')};
   }
   if(s.id==='full'&&CUR>1){
     const past=[1,2].map(x=>timeWithPicks(entries[key(x,'full',CUR-1)])).filter(Boolean);
@@ -659,10 +663,16 @@ const lreps=(mv,L)=>L>=1?mv.reps[L-1]:mv.reps[0]-2;
 const lmove=(mv,L)=>lreps(mv,L)+' '+mv.n;
 /* The level being worked in round r: the round number, unless she has dropped back. */
 const lwork=r=>T.cap!=null?Math.min(r,T.cap):r;
+/* Weights used in this ladder (start from her saved weights; drops last only for this session). */
+const wtText=g=>{const w=T.wt&&T.wt[g];return w==null?'':g==='kb'?kgs(w)+' kettlebell':'2 × '+kgs(w)};
+const wtDown=g=>{const w=T.wt&&T.wt[g];if(w==null)return null;const n=Math.round((w-GEAR[g].step)*10)/10;return n>0?n:null};
+const ladderMove=()=>{const e=elapsed();return e<0?null:T.moves[Math.floor(e/60)%T.moves.length]};
+const dropsText=()=>(T.drops||[]).map(d=>GEAR[d.g].label+' '+d.from+' → '+d.to+' kg in round '+d.r).join(', ');
 function blockTimer(sid,w,bi){
   const s=byId(sid),b=s.blocks[bi],ref={k:key(w,sid),bi,sid,w},title=s.name+' · '+b.title;
-  if(b.t==='ladder'){const n=hasL7(sid,w)?7:6;
-    return startTimer({type:'ladder',rounds:n,moves:b.moves,label:'Ladder EMOM'+(n===7?' + Level 7':''),cap:null,level:null,undo:null,ref,title})}
+  if(b.t==='ladder'){const n=hasL7(sid,w)?7:6,wt={};
+    b.moves.forEach(m=>{if(m.g)wt[m.g]=gw(m.g)});
+    return startTimer({type:'ladder',rounds:n,moves:b.moves,label:'Ladder EMOM'+(n===7?' + Level 7':''),cap:null,level:null,undo:null,wt,drops:[],choice:false,ref,title})}
   if(b.t==='warmup')return startTimer({type:'countdown',secs:b.secs,label:'Warm-up',move:'Warm-up',x:b.text,ref,title});
   if(b.t==='emom')return startTimer({type:'emom',rounds:b.rounds,moves:b.moves,label:b.title,ref,title});
   if(b.t==='amrap')return startTimer({type:'amrap',secs:b.secs,moves:b.moves,label:b.title,ref,title});
@@ -723,8 +733,15 @@ function renderCtrl(){
     c.innerHTML='<div class="t-confirm"><span>Stop the timer here?</span><div class="t-ctrl"><button class="t-btn" data-act="t-keep">Keep going</button><button class="t-btn" data-act="t-end">Stop here</button></div></div>';return;
   }
   let main='';
+  if(T.type==='ladder'&&T.choice){
+    const mv=ladderMove(),g=mv&&mv.g,to=g?wtDown(g):null;
+    c.innerHTML='<div class="t-confirm"><span>'+(mv?esc(mv.n.charAt(0).toUpperCase()+mv.n.slice(1)):'This move')+' won’t fit?</span><div class="t-ctrl">'
+      +(to!=null?'<button class="t-btn go wide" data-act="t-dropwt">Drop weight · '+esc(kgs(T.wt[g]))+' → '+esc(kgs(to))+'<br><small>Keep the reps, keep climbing</small></button>':'')
+      +'<button class="t-btn wide" data-act="t-dropreps">Drop back 2 reps</button><button class="t-btn wide" data-act="t-cancel">Cancel</button></div></div>';return;
+  }
   if(T.type==='ladder'){
-    c.innerHTML='<div class="t-ctrl"><button class="t-btn fail wide" data-act="t-fail">Couldn’t finish · drop back 2</button>'
+    const mv=ladderMove(),canWt=!!(mv&&mv.g&&wtDown(mv.g)!=null);
+    c.innerHTML='<div class="t-ctrl"><button class="t-btn fail wide" data-act="t-fail">'+(canWt?'Couldn’t finish · drop weight or reps':'Couldn’t finish · drop back 2')+'</button>'
       +(T.undo?'<button class="t-btn wide" data-act="t-undo">Undo drop</button>':'')
       +'<button class="t-btn" data-act="t-pause">'+(T.pausedAt?'Resume':'Pause')+'</button><button class="t-btn" data-act="t-stop">Stop</button></div>';return;
   }
@@ -745,7 +762,7 @@ const ladderLevel=()=>T.level!=null?T.level:T.rounds;
 function saveTimerResult(){
   const r=T.ref,d=draft(r.k);d.done[r.bi]=true;
   if(T.type==='amrap')d.vals.rounds=String(T.count);
-  if(T.type==='ladder')d.vals.level=String(ladderLevel());
+  if(T.type==='ladder'){d.vals.level=String(ladderLevel());d.vals.drops=dropsText()}
   if(T.type==='fortime'&&T.idx>=T.steps.length)d.vals.time=fmt(T.fin.e);
   if(T.type==='steps'&&T.idx>=T.steps.length&&r.sid)d.rounds[r.bi]=byId(r.sid).blocks[r.bi].rounds;
   saveDrafts();
@@ -781,8 +798,9 @@ function tick(){
     else if(T.type==='fortime'){big=fmt(T.fin.e);move=T.idx>=T.steps.length?'Finished':'Stopped';x=T.idx>=T.steps.length?'Total time':'Stopped at step '+(T.idx+1)+' of '+T.steps.length}
     else if(T.type==='intervals'){big=fmt(T.fin.e);move='Intervals done';x='Check the distance on the elliptical.'}
     else if(T.type==='steps'){big=fmt(T.fin.e);move=T.label+' done'}
-    else if(T.type==='ladder'){const l=ladderLevel();big=String(l);move=l>0?'Level '+l+' cleared':'Level 1 next time';
-      x=T.cap!=null?'Dropped back at Level '+(T.level+1)+' and finished the time.':'Every round cleared.'}
+    else if(T.type==='ladder'){const l=ladderLevel(),dt=dropsText();big=String(l);move=l>0?'Level '+l+' cleared':'Level 1 next time';
+      x=(T.cap!=null?'Dropped back at Level '+(T.level+1)+' and finished the time.':'Every round cleared.')
+        +(dt?' Weight dropped: '+dt+'. Your saved weights haven’t changed.':'')}
     else{big=fmt(T.fin.e);move=T.type==='emom'?'EMOM done':'Done'}
     sub=T.title||'';
   }else if(e<0){
@@ -803,8 +821,9 @@ function tick(){
     if(e>=total){finish();return}
     const m=Math.floor(e/60),r=Math.floor(m/L)+1,wl=lwork(r),mv=T.moves[m%L];
     const m2=m+1,r2=Math.floor(m2/L)+1,wl2=lwork(r2),nm=T.moves[m2%L];
-    big=fmt(Math.ceil(60-(e-m*60)));move=lmove(mv,wl);x=mv.x||'';
-    next=m2<mins?'Next: '+lmove(nm,wl2)+(wl2!==wl?' · Level '+wl2:''):'Last minute';
+    if(m!==T._m){T._m=m;T.choice=false;renderCtrl()}
+    big=fmt(Math.ceil(60-(e-m*60)));move=lmove(mv,wl);x=[mv.g?wtText(mv.g):'',mv.x||''].filter(Boolean).join(' · ');
+    next=m2<mins?'Next: '+lmove(nm,wl2)+(nm.g&&wtText(nm.g)?' · '+wtText(nm.g):'')+(wl2!==wl?' · Level '+wl2:''):'Last minute';
     sub='Round '+r+' of '+T.rounds+' · Level '+wl+(T.cap!=null?' (dropped back)':'')+' · Minute '+(m%L+1)+' of '+L;bar=e/total;
     if(crossed){const sec=s%60;if(sec===0)long();else if(sec>=57)short();
       if(sec===50&&m2<mins)say((wl2!==wl?'Level '+wl2+'. ':'')+'Next: '+lmove(nm,wl2))}
@@ -896,14 +915,27 @@ document.addEventListener('click',ev=>{
     case 't-keep':T.confirm=false;return renderCtrl();
     case 't-end':return finish();
     case 't-fail':{
+      const mv=ladderMove();if(!mv)return;
+      if(mv.g&&wtDown(mv.g)!=null){T.choice=true;return renderCtrl()}
+    }
+    /* falls through: a move with no lighter weight can only drop reps */
+    case 't-dropreps':{
       const e=elapsed();if(e<0)return;
       const r=Math.floor(Math.floor(e/60)/T.moves.length)+1;
-      T.undo={cap:T.cap,level:T.level};
+      T.undo={cap:T.cap,level:T.level,wt:{...T.wt},drops:(T.drops||[]).slice()};T.choice=false;
       if(T.cap==null){T.level=r-1;T.cap=r-1}else T.cap=Math.max(0,lwork(r)-1);
       saveT();renderCtrl();short();
       say('Dropping back to level '+T.cap+'. '+(T.level>0?'Level '+T.level+' logged.':'Keep going.'));return tick();
     }
-    case 't-undo':if(T.undo){T.cap=T.undo.cap;T.level=T.undo.level;T.undo=null;saveT();renderCtrl()}return tick();
+    case 't-dropwt':{
+      const mv=ladderMove(),to=mv&&mv.g?wtDown(mv.g):null;if(to==null)return;
+      const r=Math.floor(Math.floor(elapsed()/60)/T.moves.length)+1;
+      T.undo={cap:T.cap,level:T.level,wt:{...T.wt},drops:(T.drops||[]).slice()};T.choice=false;
+      (T.drops=T.drops||[]).push({g:mv.g,from:T.wt[mv.g],to,r});T.wt[mv.g]=to;
+      saveT();renderCtrl();short();say('Dropping to '+kgs(to)+'. Keep climbing.');return tick();
+    }
+    case 't-cancel':T.choice=false;return renderCtrl();
+    case 't-undo':if(T.undo){T.cap=T.undo.cap;T.level=T.undo.level;if(T.undo.wt){T.wt=T.undo.wt;T.drops=T.undo.drops}T.undo=null;saveT();renderCtrl()}return tick();
     case 'score-block':ui.sb=+b.dataset.b;saveUi();return render();
     case 't-plus':T.count++;saveT();short();return tick();
     case 't-minus':T.count=Math.max(0,T.count-1);saveT();return tick();
